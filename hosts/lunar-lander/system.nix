@@ -54,6 +54,7 @@
     };
 
     programs = {
+      emacs.enable = true;
       yubioath.enable = true;
     };
 
@@ -63,9 +64,8 @@
     };
 
     wayland = {
-      sway = {
-        enable = true;
-      };
+      gtk.enable = true;
+      sway.enable = true;
     };
 
     # x11 = {
