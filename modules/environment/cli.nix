@@ -23,6 +23,7 @@ in
         rsync
         ripgrep
         neovim
+        autojump
       ];
 
       variables = {
