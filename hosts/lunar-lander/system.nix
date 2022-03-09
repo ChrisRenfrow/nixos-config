@@ -54,6 +54,7 @@
     };
 
     services = {
+      redshift.enable = true;
       mullvad.enable = true;
     };
 
