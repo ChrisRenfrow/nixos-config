@@ -20,6 +20,7 @@ in
       extraPackages = with pkgs; [
         swaylock
         swayidle
+        xwayland
         wl-clipboard
         kanshi
         mako
