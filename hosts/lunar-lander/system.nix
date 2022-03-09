@@ -53,6 +53,10 @@
       cli.enable = true;
     };
 
+    programs = {
+      yubioath.enable = true;
+    };
+
     services = {
       redshift.enable = true;
       mullvad.enable = true;
