@@ -67,14 +67,5 @@
       gtk.enable = true;
       sway.enable = true;
     };
-
-    # x11 = {
-    #   xsession = {
-    #     # videoDrivers = "modesetting";
-    #     enable = true;
-    #   };
-    #   gtk.enable = true;
-    #   xfce.enable = true;
-    # };
   };
 }

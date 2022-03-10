@@ -5,124 +5,124 @@ let
 
   cfg = config.modules.programs.emacs;
 
-  myEmacs = with pkgs;
-    ((emacsPackagesNgGen emacsPgtkGcc).emacsWithPackages (epkgs: [ 
+  emacs-pkg = with pkgs;
+    ((emacsPackagesFor emacs).emacsWithPackages (epkgs: with epkgs; [ 
       ## UI
-      epkgs.ivy
-      epkgs.ivy-rich
-      epkgs.prescient
-      epkgs.ivy-prescient
-      epkgs.counsel
-      epkgs.vertico
-      epkgs.general
-      epkgs.which-key
-      epkgs.hydra
-      epkgs.evil
-      epkgs.evil-collection
-      epkgs.evil-surround
-      epkgs.evil-nerd-commenter
-      epkgs.doom-modeline
-      epkgs.minions
-      epkgs.doom-themes
+      ivy
+      ivy-rich
+      prescient
+      ivy-prescient
+      counsel
+      vertico
+      general
+      which-key
+      hydra
+      evil
+      evil-collection
+      evil-surround
+      evil-nerd-commenter
+      doom-modeline
+      minions
+      doom-themes
       ## Utils
-      epkgs.super-save
-      epkgs.undo-tree
-      epkgs.diminish
-      epkgs.ws-butler
-      epkgs.flx
+      super-save
+      undo-tree
+      diminish
+      ws-butler
+      flx
       ## Terms
-      epkgs.vterm
+      vterm
       ## Org mode
-      epkgs.org
-      epkgs.org-roam
-      epkgs.org-appear
-      epkgs.deft
-      epkgs.org-pomodoro
-      epkgs.org-drill
-      epkgs.org-superstar
+      org
+      org-roam
+      org-appear
+      deft
+      org-pomodoro
+      org-drill
+      org-superstar
       epkgs.evil-org   
       ## Project-management
-      epkgs.projectile 
-      epkgs.counsel-projectile
-      epkgs.perspective
-      epkgs.magit
-      epkgs.treemacs
-      epkgs.treemacs-evil
-      epkgs.treemacs-projectile
-      epkgs.treemacs-magit
-      epkgs.treemacs-perspective
-      epkgs.treemacs-icons-dired
-      epkgs.treemacs-all-the-icons
+      projectile 
+      counsel-projectile
+      perspective
+      magit
+      treemacs
+      treemacs-evil
+      treemacs-projectile
+      treemacs-magit
+      treemacs-perspective
+      treemacs-icons-dired
+      treemacs-all-the-icons
       ## LSP
-      epkgs.lsp-mode
-      epkgs.lsp-ui
-      epkgs.lsp-treemacs
-      epkgs.lsp-ivy
-      epkgs.helpful
+      lsp-mode
+      lsp-ui
+      lsp-treemacs
+      lsp-ivy
+      helpful
       # epkgs.apheleia # Not available via melpa as of 2021-09-19 (https://github.com/melpa/melpa/pull/7699)
-      epkgs.nix-mode
-      epkgs.rust-mode
-      epkgs.haskell-mode
-      epkgs.markdown-mode
-      epkgs.js2-mode
-      epkgs.typescript-mode
-      epkgs.prettier
-      epkgs.web-mode
-      epkgs.yaml-mode
+      nix-mode
+      rust-mode
+      haskell-mode
+      markdown-mode
+      js2-mode
+      typescript-mode
+      prettier
+      web-mode
+      yaml-mode
       ## Coding Productivity
-      epkgs.flycheck
-      epkgs.smartparens
-      epkgs.rainbow-delimiters
-      epkgs.rainbow-mode
+      flycheck
+      smartparens
+      rainbow-delimiters
+      rainbow-mode
       ## Writing
-      epkgs.writegood-mode
-      epkgs.darkroom
-      epkgs.auctex
+      writegood-mode
+      darkroom
+      auctex
     ]));
 
 in {
 
-  options.modules.pkgs.emacs = {
+  options.modules.programs.emacs = {
     enable = mkEnableOption "emacs";
   };
 
   config = mkIf cfg.enable {
     services.emacs = {
       enable = true;
-      package = myEmacs;
+      package = emacs-pkg;
     };
 
     system.user.hm = {
       programs.emacs = {
         enable = true;
-        package = myEmacs;
+        package = emacs-pkg;
       };
     };
 
     environment = {
       systemPackages = with pkgs; [
         ## writegood-mode
-        pkgs.aspell
-        pkgs.aspellDicts.en
-        pkgs.aspellDicts.en-science
-        pkgs.aspellDicts.en-computers
+        aspell
+        aspellDicts.en
+        aspellDicts.en-science
+        aspellDicts.en-computers
         ## nix-mode
-        pkgs.nixfmt
+        nixfmt
         ## rust-mode
-        pkgs.cargo
-        pkgs.rustfmt
+        cargo
+        rustfmt
         ## haskell-mode
-        pkgs.ghc
-        pkgs.ghcid
-        pkgs.hlint
-        pkgs.cabal-install
-        pkgs.stack
+        ghc
+        ghcid
+        hlint
+        cabal-install
+        stack
         ## js2-mode & typescript-mode
-        pkgs.nodejs
-        pkgs.yarn
+        nodejs
+        yarn
         ## auctex
-        pkgs.texinfo
-        pkgs.texlive.combined.scheme-full
+        texinfo
+        texlive.combined.scheme-full
       ];
     };
   };
