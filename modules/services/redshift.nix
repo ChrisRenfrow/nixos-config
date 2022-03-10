@@ -21,6 +21,10 @@ in
       provider = "manual";
       latitude = config.system.locale.location.latitude;
       longitude = config.system.locale.location.longitude;
+      temperature = {
+        day = 5500;
+        night = 2250;
+      };
     };
   };
 }
