@@ -25,6 +25,7 @@
   };
 
   fonts.fonts = with pkgs; [
+    (iosevka-bin.override { variant = "aile"; })
     iosevka-bin
     noto-fonts
     noto-fonts-emoji

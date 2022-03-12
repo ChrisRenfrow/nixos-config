@@ -1,4 +1,4 @@
-{ config, options, pkgs, pkgsLocal, lib, ... }:
+{ config, options, pkgs, pkgsLocal, lib, inputs, ... }:
 
 let
   inherit (lib) mkIf mkEnableOption;
@@ -6,7 +6,7 @@ let
   cfg = config.modules.programs.emacs;
 
   emacs-pkg = with pkgs;
-    ((emacsPackagesFor emacs).emacsWithPackages (epkgs: with epkgs; [ 
+    ((emacsPackagesFor emacsPgtkGcc).emacsWithPackages (epkgs: with epkgs; [ 
       ## UI
       ivy
       ivy-rich
@@ -87,6 +87,9 @@ in {
   };
 
   config = mkIf cfg.enable {
+
+    nixpkgs.overlays = with inputs; [ (import emacs-overlay) ];
+
     services.emacs = {
       enable = true;
       package = emacs-pkg;

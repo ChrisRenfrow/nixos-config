@@ -34,7 +34,7 @@ let
   collectPackages = path: attrs:
     mapDir (p: import p attrs) path;
 
-  mkHost = path: attrs@{ modulesPath, pkgsLocal, home-manager, localLib, ... }:
+  mkHost = path: attrs@{ modulesPath, pkgsLocal, home-manager, localLib, inputs, ... }:
     let
       name = baseNameOf path;
     in
@@ -47,6 +47,7 @@ let
             _module.args.hostName = name;
             _module.args.hmLib = home-manager.lib;
             _module.args.localLib = localLib;
+            _module.args.inputs = inputs;
           }
           home-manager.nixosModule
           (path + "/system.nix")

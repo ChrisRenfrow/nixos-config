@@ -10,19 +10,16 @@
     emacs-overlay.url = "github:nix-community/emacs-overlay/master";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, emacs-overlay, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
         inherit system;
-        overlays = [
-          (import emacs-overlay)
-        ];
       };
       localLib = import ./lib { inherit nixpkgs; inherit pkgs; };
     in {
       nixosConfigurations = localLib.flakeUtils.collectHosts ./hosts {
-        inherit home-manager localLib;
+        inherit home-manager localLib inputs;
         modulesPath = ./modules;
         pkgsLocal = self.packages."${system}";
       };
