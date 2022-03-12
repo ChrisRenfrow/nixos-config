@@ -27,6 +27,8 @@ in
         wofi
         waybar
         jq # Used to parse swaymsg output
+        slurp
+        grim
       ];
       # extraSessionCommands = ''
       # # https://github.com/swaywm/wlroots/blob/master/docs/env_vars.md
