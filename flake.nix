@@ -7,10 +7,7 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    emacs-overlay.url = "github:nix-community/emacs-overlay/master";
   };
 
   outputs = inputs@{ self, nixpkgs, home-manager, emacs-overlay, ... }:
@@ -30,6 +27,10 @@
         pkgsLocal = self.packages."${system}";
       };
 
-      nixosModules = localLib.flakeUtils.collectModules ./modules {};
+      nixosModules = localLib.flakeUtils.collectModules ./modules { inherit pkgs; };
+
+      packages."${system}" = localLib.flakeUtils.collectPackages ./packages { inherit pkgs; };
+
+      devShell."${system}" = import ./shell.nix { inherit pkgs; };
     };
 }

@@ -56,6 +56,7 @@
     programs = {
       emacs.enable = true;
       yubioath.enable = true;
+      swaylock-blur.enable = true;
     };
 
     services = {

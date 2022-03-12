@@ -31,6 +31,9 @@ let
   collectModules = path: attrs:
     filter (isFunction) (mapAllFiles import path);
 
+  collectPackages = path: attrs:
+    mapDir (p: import p attrs) path;
+
   mkHost = path: attrs@{ modulesPath, pkgsLocal, home-manager, localLib, ... }:
     let
       name = baseNameOf path;
@@ -52,5 +55,5 @@ let
       };
 in
 {
-  inherit collectHosts collectModules;
+  inherit collectHosts collectModules collectPackages;
 }
