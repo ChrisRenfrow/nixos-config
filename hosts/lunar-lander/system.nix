@@ -17,6 +17,11 @@
     blacklistedKernelModules = [ "dvd_usb_rtl28xxu" ];
   };
 
+  hardware.pulseaudio = {
+    enable = true;
+    package = pkgs.pulseaudioFull;
+  };
+
   environment = {
     systemPackages = with pkgs; [
       firefox
