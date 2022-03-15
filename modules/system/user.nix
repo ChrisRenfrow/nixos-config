@@ -60,6 +60,20 @@ in
         extraGroups = [ "wheel" "video" ];
         isNormalUser = true;
       };
+
+      hm = {
+        xdg = {
+          enable = true;
+          userDirs = {
+            enable = true;
+            documents = "${cfg.home}/documents";
+            download = "${cfg.home}/downloads";
+            music = "${cfg.home}/music";
+            pictures = "${cfg.home}/pictures";
+            videos = "${cfg.home}/videos";
+          };
+        };
+      };
     };
   };
 }
