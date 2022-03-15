@@ -66,6 +66,9 @@ in
           enable = true;
           userDirs = {
             enable = true;
+            desktop = "/dev/null";
+            publicShare = "/dev/null";
+            templates = "/dev/null";
             documents = "${cfg.home}/documents";
             download = "${cfg.home}/downloads";
             music = "${cfg.home}/music";
