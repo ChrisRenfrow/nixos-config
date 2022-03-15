@@ -22,6 +22,10 @@ in
         swayidle
         xwayland
         wl-clipboard
+        autotiling
+        flashfocus
+        i3-ratiosplit
+        wf-recorder
         kanshi
         mako
         wofi
