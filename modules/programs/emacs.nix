@@ -69,6 +69,7 @@ let
       prettier
       web-mode
       yaml-mode
+      i3wm-config-mode
       ## Coding Productivity
       flycheck
       smartparens

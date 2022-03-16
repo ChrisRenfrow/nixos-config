@@ -33,6 +33,8 @@ in
         jq # Used to parse swaymsg output
         slurp
         grim
+        brightnessctl
+        playerctl
       ];
       # extraSessionCommands = ''
       # # https://github.com/swaywm/wlroots/blob/master/docs/env_vars.md
