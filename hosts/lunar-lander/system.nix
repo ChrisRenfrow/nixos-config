@@ -63,6 +63,7 @@
       emacs.enable = true;
       yubioath.enable = true;
       swaylock-blur.enable = true;
+      cook-cli.enable = true;
     };
 
     services = {
