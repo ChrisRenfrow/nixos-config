@@ -1,7 +1,7 @@
 { config, pkgs, pkgsLocal, ... }:
 
 {
-  imports = [];
+  imports = [ ];
 
   boot = {
     # Fix freezing issues on Dell XPS 9550
@@ -22,12 +22,7 @@
     package = pkgs.pulseaudioFull;
   };
 
-  environment = {
-    systemPackages = with pkgs; [
-      firefox
-      syncplay
-    ];
-  };
+  environment = { systemPackages = with pkgs; [ firefox syncplay ]; };
 
   fonts.fonts = with pkgs; [
     (iosevka-bin.override { variant = "aile"; })

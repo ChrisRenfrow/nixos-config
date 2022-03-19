@@ -1,19 +1,12 @@
 { config, options, pkgs, pkgsLocal, lib, ... }:
 
 let
-  inherit (lib)
-    mkIf
-    mkOption
-    mkEnableOption
-    types
-    optionals;
-  inherit (pkgs.vscode-utils)
-    extensionsFromVscodeMarketplace;
+  inherit (lib) mkIf mkOption mkEnableOption types optionals;
+  inherit (pkgs.vscode-utils) extensionsFromVscodeMarketplace;
 
   cfg = config.modules.environment.code;
   vscode-package = pkgs.vscodium;
-in
-{
+in {
   options.modules.environment.code = {
     enable = mkEnableOption "Code environment";
 
@@ -36,27 +29,15 @@ in
       keep-derivations = true
     '';
 
-    environment.systemPackages = with pkgs; [
-      alacritty
-      direnv
-      cmake
-      gnumake
-      clang
-      clang-tools
-      git
-      vscode-package
-    ] ++ optionals cfg.enableRust [
-      rustc
-      cargo
-      rustup
-      rls
-      rustfmt
-    ] ++ optionals cfg.enableHaskell [
-      ghc
-      haskell-language-server
-      cabal-install
-      stack
-    ];
+    environment.systemPackages = with pkgs;
+      [ alacritty direnv cmake gnumake clang clang-tools git vscode-package ]
+      ++ optionals cfg.enableRust [ rustc cargo rustup rls rustfmt ]
+      ++ optionals cfg.enableHaskell [
+        ghc
+        haskell-language-server
+        cabal-install
+        stack
+      ];
 
     system.user.hm = {
       programs = {
@@ -68,22 +49,23 @@ in
         vscode = {
           enable = true;
           package = vscode-package;
-          extensions = with pkgs.vscode-extensions; [
-            # Nix community-supported extensions
-            bbenoist.nix
-          ] ++ extensionsFromVscodeMarketplace [
-            # VSCode marketplace extensions
-            # {
-            #   name = "vscode-direnv";
-            #   publisher = "cab404";
-            #   version = "1.0.0";
-            #   sha256 = "fa72c7f93f6fe93402a8a670e873cdfd97af43ae45566d92028d95f5179c3376";
-            # }
-          ] ++ optionals cfg.enableRust [
-            # Rust extensions
-          ] ++ optionals cfg.enableHaskell [
-            # Haskell extensions
-          ];
+          extensions = with pkgs.vscode-extensions;
+            [
+              # Nix community-supported extensions
+              bbenoist.nix
+            ] ++ extensionsFromVscodeMarketplace [
+              # VSCode marketplace extensions
+              # {
+              #   name = "vscode-direnv";
+              #   publisher = "cab404";
+              #   version = "1.0.0";
+              #   sha256 = "fa72c7f93f6fe93402a8a670e873cdfd97af43ae45566d92028d95f5179c3376";
+              # }
+            ] ++ optionals cfg.enableRust [
+              # Rust extensions
+            ] ++ optionals cfg.enableHaskell [
+              # Haskell extensions
+            ];
         };
 
         git = {

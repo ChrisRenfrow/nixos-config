@@ -1,6 +1,7 @@
 { pkgs, ... }:
 
-with pkgs; stdenv.mkDerivation {
+with pkgs;
+stdenv.mkDerivation {
   pname = "swaylock-blur";
   version = "0.1";
   buildInputs = [ swaylock grim imagemagick ];

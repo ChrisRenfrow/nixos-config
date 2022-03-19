@@ -1,20 +1,16 @@
 { config, options, pkgs, pkgsLocal, lib, hostName, hmLib, localLib, ... }:
 
 let
-  inherit (lib)
-    mkOption
-    mkAliasDefinitions
-    types;
-    # hasPrefix
-    # removePrefix;
+  inherit (lib) mkOption mkAliasDefinitions types;
+  # hasPrefix
+  # removePrefix;
   # inherit (builtins)
-    # filter
-    # attrValues
-    # concatStringsSep;
+  # filter
+  # attrValues
+  # concatStringsSep;
 
   cfg = config.system.user;
-in
-{
+in {
   options.system.user = {
     name = mkOption {
       type = with types; str;
@@ -47,8 +43,10 @@ in
   };
 
   config = rec {
-    users.users."${cfg.name}" = mkAliasDefinitions options.system.user.extraConfig;
-    home-manager.users."${cfg.name}" = mkAliasDefinitions options.system.user.hm;
+    users.users."${cfg.name}" =
+      mkAliasDefinitions options.system.user.extraConfig;
+    home-manager.users."${cfg.name}" =
+      mkAliasDefinitions options.system.user.hm;
 
     system.user = {
       uid = 1000;

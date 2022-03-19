@@ -5,14 +5,9 @@ let
 
   cfg = config.modules.services.redshift;
   isWayland = config.modules.wayland.sway.enable == true;
-  redshift-pname = if isWayland
-                   then "gammastep"
-                   else "redshift";
-in
-{
-  options.modules.services.redshift = {
-    enable = mkEnableOption "redshift";
-  };
+  redshift-pname = if isWayland then "gammastep" else "redshift";
+in {
+  options.modules.services.redshift.enable = mkEnableOption "redshift";
 
   config = mkIf cfg.enable {
     system.user.hm.services."${redshift-pname}" = {

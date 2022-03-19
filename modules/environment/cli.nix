@@ -4,8 +4,7 @@ let
   inherit (lib) mkIf mkEnableOption;
 
   cfg = config.modules.environment.cli;
-in
-{
+in {
   options.modules.environment.cli = {
     enable = mkEnableOption "cli environment";
   };

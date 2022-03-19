@@ -13,10 +13,11 @@
   outputs = inputs@{ self, nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { 
-        inherit system;
+      pkgs = import nixpkgs { inherit system; };
+      localLib = import ./lib {
+        inherit nixpkgs;
+        inherit pkgs;
       };
-      localLib = import ./lib { inherit nixpkgs; inherit pkgs; };
     in {
       nixosConfigurations = localLib.flakeUtils.collectHosts ./hosts {
         inherit home-manager localLib inputs;
@@ -24,9 +25,11 @@
         pkgsLocal = self.packages."${system}";
       };
 
-      nixosModules = localLib.flakeUtils.collectModules ./modules { inherit pkgs; };
+      nixosModules =
+        localLib.flakeUtils.collectModules ./modules { inherit pkgs; };
 
-      packages."${system}" = localLib.flakeUtils.collectPackages ./packages { inherit pkgs; };
+      packages."${system}" =
+        localLib.flakeUtils.collectPackages ./packages { inherit pkgs; };
 
       devShell."${system}" = import ./shell.nix { inherit pkgs; };
     };

@@ -13,8 +13,7 @@ let
       timeZone = "America/Los_Angeles";
     };
   };
-in
-{
+in {
   options.system.locale = {
     locationName = mkOption {
       type = with types; enum (attrNames locations);
@@ -28,12 +27,9 @@ in
     };
   };
 
-  config =
-    let
-      location = locations."${cfg.locationName}";
-    in
-      {
-        system.locale.location = location;
-        time.timeZone = location.timeZone;
-      };
+  config = let location = locations."${cfg.locationName}";
+  in {
+    system.locale.location = location;
+    time.timeZone = location.timeZone;
+  };
 }

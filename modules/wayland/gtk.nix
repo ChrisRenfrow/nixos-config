@@ -3,11 +3,8 @@
 let
   inherit (lib) mkIf mkEnableOption makeBinPath;
   cfg = config.modules.wayland.gtk;
-in
-{
-  options.modules.wayland.gtk = {
-    enable = mkEnableOption "gtk";
-  };
+in {
+  options.modules.wayland.gtk.enable = mkEnableOption "gtk";
 
   config = mkIf cfg.enable {
     programs.sway.wrapperFeatures.gtk = true;
