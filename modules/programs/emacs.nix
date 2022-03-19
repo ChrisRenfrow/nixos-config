@@ -40,7 +40,7 @@ let
       org-pomodoro
       org-drill
       org-superstar
-      epkgs.evil-org   
+      evil-org
       ## Project-management
       projectile 
       counsel-projectile
@@ -59,7 +59,7 @@ let
       lsp-treemacs
       lsp-ivy
       helpful
-      # epkgs.apheleia # Not available via melpa as of 2021-09-19 (https://github.com/melpa/melpa/pull/7699)
+      # apheleia # Not available via melpa as of 2021-09-19 (https://github.com/melpa/melpa/pull/7699)
       nix-mode
       rust-mode
       haskell-mode
@@ -70,6 +70,7 @@ let
       web-mode
       yaml-mode
       i3wm-config-mode
+      # cook-mode # TODO: Not packaged anywhere, will need to provide myself
       ## Coding Productivity
       flycheck
       smartparens
