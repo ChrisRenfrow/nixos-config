@@ -59,7 +59,7 @@
       emacs.enable = true;
       yubioath.enable = true;
       swaylock-blur.enable = true;
-      cook-cli.enable = true;
+      # cook-cli.enable = true; # suddenly stopped working, impure is impure
     };
 
     services = {
