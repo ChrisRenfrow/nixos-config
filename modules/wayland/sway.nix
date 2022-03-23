@@ -36,6 +36,33 @@ in {
       # '';
     };
 
+    environment.sessionVariables = {
+      MOZ_ENABLE_WAYLAND = "1";
+      XDG_CURRENT_DESKTOP = "sway";
+    };
+
+    xdg = {
+      portal = {
+        enable = true;
+        gtkUsePortal = true;
+        extraPortals = with pkgs; [
+          xdg-desktop-portal-wlr
+          xdg-desktop-portal-gtk
+        ];
+        wlr = {
+          enable = true;
+          settings = {
+            # screencast = {
+            #   max_fps = 30;
+            #   chooser_type = "simple";
+            #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+            # };
+          };
+        };
+
+      };
+    };
+
     services = {
       # TODO: Make use of greetd and choice of greeter configurable?
       greetd = {
@@ -47,6 +74,8 @@ in {
           user = "${config.system.user.name}";
         };
       };
+
+      pipewire.enable = true;
     };
 
   };
