@@ -71,6 +71,7 @@ let
         web-mode
         yaml-mode
         i3wm-config-mode
+        ledger-mode
         # cook-mode # TODO: Not packaged anywhere, will need to provide myself
         ## Coding Productivity
         flycheck
@@ -127,6 +128,8 @@ in {
         ## auctex
         texinfo
         texlive.combined.scheme-full
+        ##
+        ledger
       ];
     };
   };
