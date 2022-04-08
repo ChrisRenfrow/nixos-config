@@ -24,6 +24,9 @@
 
   environment = { systemPackages = with pkgs; [ firefox syncplay ]; };
 
+  # make whatis, apropos, and man -k work again
+  documentation.man.generateCaches = true;
+
   fonts.fonts = with pkgs; [
     (iosevka-bin.override { variant = "aile"; })
     iosevka-bin
@@ -46,6 +49,17 @@
   system = {
     user.name = "crenfrow";
     locale.locationName = "San_Francisco";
+  };
+
+  services = {
+    printing = {
+      enable = true;
+      drivers = with pkgs; [ hplip ];
+    };
+    avahi = {
+      enable = true;
+      nssmdns = true;
+    };
   };
 
   modules = {
