@@ -51,6 +51,8 @@
     locale.locationName = "San_Francisco";
   };
 
+  nix.settings.trusted-users = [ "crenfrow" ];
+
   services = {
     printing = {
       enable = true;
