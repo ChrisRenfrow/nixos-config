@@ -17,8 +17,6 @@ in {
   config = mkIf cfg.enable {
     environment.systemPackages = with pkgs; [ imv ];
 
-    system.user.hm = {
-      xdg.configFile."imv/config".text = toINI { } settings;
-    };
+    system.user.hm = { xdg.configFile."imv/config".text = toINI { } settings; };
   };
 }
