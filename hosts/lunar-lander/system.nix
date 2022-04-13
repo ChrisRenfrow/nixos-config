@@ -77,7 +77,7 @@
       swaylock-blur.enable = true;
       zoom.enable = true;
       imv.enable = true;
-      # cook-cli.enable = true; # suddenly stopped working, impure is impure
+      cook-cli.enable = true;
     };
 
     services = {
