@@ -75,7 +75,12 @@ in {
         };
       };
 
-      pipewire.enable = true;
+      dbus.enable = true;
+
+      pipewire = {
+        enable = true;
+        wireplumber.enable = true;
+      };
     };
 
   };
