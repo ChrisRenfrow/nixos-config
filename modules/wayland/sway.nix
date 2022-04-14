@@ -41,6 +41,12 @@ in {
       XDG_CURRENT_DESKTOP = "sway";
     };
 
+    system.user.hm.xsession.pointerCursor = {
+      name = "Adwaita";
+      package = pkgs.gnome.adwaita-icon-theme;
+      size = 24;
+    };
+
     xdg = {
       portal = {
         enable = true;
