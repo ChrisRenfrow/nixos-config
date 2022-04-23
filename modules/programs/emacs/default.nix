@@ -29,6 +29,31 @@ in {
       };
     };
 
-    environment = { systemPackages = with pkgs; [ ]; };
+    environment = {
+      systemPackages = with pkgs; [
+        ## writegood-mode
+        aspell
+        aspellDicts.en
+        aspellDicts.en-science
+        aspellDicts.en-computers
+        ## nix-mode
+        nixfmt
+        ## rust-mode
+        cargo
+        rustfmt
+        ## haskell-mode
+        ghc
+        ghcid
+        hlint
+        cabal-install
+        stack
+        ## js2-mode & typescript-mode
+        nodejs
+        yarn
+        ## auctex
+        texinfo
+        texlive.combined.scheme-full
+      ];
+    };
   };
 }
