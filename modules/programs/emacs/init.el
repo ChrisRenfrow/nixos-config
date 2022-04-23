@@ -25,6 +25,8 @@
 
 (global-set-key (kbd "C-M-u") 'universal-argument)
 
+(use-package diminish)
+
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)

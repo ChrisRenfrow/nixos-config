@@ -25,7 +25,12 @@ in {
           alwaysEnsure = true;
           package = pkgs.emacsPgtkGcc;
           config = ./init.el;
-          extraEmacsPackages = epkgs: with epkgs; [ nix-mode ];
+          extraEmacsPackages = epkgs: with epkgs; [
+            ivy-rich
+            vterm
+            treemacs-all-the-icons
+            nix-mode
+          ];
         };
       };
     };
