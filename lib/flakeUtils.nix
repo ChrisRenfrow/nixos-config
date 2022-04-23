@@ -1,7 +1,7 @@
 { nixpkgs, pkgs, ... }:
 
 let
-  inherit (pkgs.lib) mapAttrsToList flatten optionalAttrs;
+  inherit (pkgs.lib) mapAttrsToList flatten optionalAttrs hasSuffix;
   inherit (builtins) pathExists readDir filter mapAttrs isFunction;
 
   mapDir = mapper: path:
@@ -16,7 +16,9 @@ let
 
   collectHosts = path: attrs: mapDir (p: mkHost p attrs) path;
 
-  collectModules = path: attrs: filter (isFunction) (mapAllFiles import path);
+  collectModules = path: attrs:
+    filter (isFunction)
+    (mapAllFiles (p: if hasSuffix ".nix" p then import p else null) path);
 
   collectPackages = path: attrs: mapDir (p: import p attrs) path;
 
