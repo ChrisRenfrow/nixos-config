@@ -13,8 +13,10 @@ in {
 
     nixpkgs.overlays = with inputs; [ (import emacs-overlay) ];
 
-    system.user.hm.home.file.".emacs.d/early-init.el".text = readFile ./early-init.el;
-    system.user.hm.home.file.".emacs.d/init.el".text = readFile ./init.el;
+    system.user.hm.home.file = {
+      ".emacs.d/early-init.el".text = readFile ./early-init.el;
+      ".emacs.d/init.el".text = readFile ./init.el;
+    };
 
     system.user.hm = {
       programs.emacs = {
