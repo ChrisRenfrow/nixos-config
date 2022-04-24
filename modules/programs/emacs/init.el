@@ -22,6 +22,9 @@
 
 (global-set-key (kbd "C-M-u") 'universal-argument)
 
+(setq backup-directory-alist
+          `(("." . ,(concat user-emacs-directory "backups"))))
+
 (use-package diminish)
 
 (use-package ivy
@@ -139,7 +142,10 @@
 
 (use-package undo-tree
   :init
-  (global-undo-tree-mode 1))
+  (global-undo-tree-mode)
+	:config
+	(setq undo-tree-history-directory-alist
+				`(("." . ,(concat user-emacs-directory "undo-tree")))))
 
 (defun cr/no-arrow-keys ()
   "Print a friendly reminder that arrow keys have been disabled."
@@ -242,7 +248,8 @@
   :diminish super-save-mode
   :config
   (super-save-mode +1)
-  (setq super-save-auto-save-when-idle t))
+  (setq super-save-auto-save-when-idle t)
+	(setq auto-save-default nil))
 
 (setq global-auto-revert-non-file-buffers t)
 (global-auto-revert-mode 1)
