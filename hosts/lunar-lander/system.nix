@@ -17,10 +17,30 @@
     blacklistedKernelModules = [ "dvd_usb_rtl28xxu" ];
   };
 
+  ## TODO: Make bluetooth support into an optional module
+  hardware.enableAllFirmware = true;
+
   hardware.pulseaudio = {
     enable = true;
     package = pkgs.pulseaudioFull;
+    extraModules = with pkgs; [ pulseaudio-modules-bt ];
+    extraConfig = ''
+      load-module module-switch-on-connect
+    '';
   };
+
+  hardware.bluetooth = {
+    enable = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+        Disable = "Headset";
+        MultiProfile = "multiple";
+      };
+    };
+  };
+
+  services.blueman.enable = true;
 
   environment = { systemPackages = with pkgs; [ firefox syncplay ]; };
 
