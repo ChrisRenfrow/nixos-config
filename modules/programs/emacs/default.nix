@@ -27,7 +27,7 @@ in {
         enable = true;
         package = pkgs.emacsWithPackagesFromUsePackage {
           alwaysEnsure = true;
-          package = pkgs.emacsPgtkGcc;
+          package = pkgs.emacsPgtkNativeComp;
           config = ./init.el;
           extraEmacsPackages = epkgs:
             with epkgs; [
