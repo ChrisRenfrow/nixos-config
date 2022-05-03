@@ -45,6 +45,11 @@
   :config
   (ivy-mode 1))
 
+(use-package ivy-rich
+	:after ivy
+	:init
+	(ivy-rich-mode 1))
+
 (use-package counsel
   :demand t
   :bind (("M-x" . counsel-M-x)
@@ -61,14 +66,10 @@
   :init
   (setq ivy-flx-limit 10000))
 
-(use-package prescient
-  :after counsel
-  :config
-  (prescient-persist-mode 1))
-
 (use-package ivy-prescient
-	:after prescient
+	:after counsel
 	:config
+	(prescient-persist-mode 1)
 	(ivy-prescient-mode 1))
 
 (use-package general
