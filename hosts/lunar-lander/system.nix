@@ -67,7 +67,7 @@
 
   system = {
     user.name = "crenfrow";
-    locale.locationName = "San_Francisco";
+    locale.locationName = "San Francisco";
   };
 
   nix.settings.trusted-users = [ "crenfrow" ];

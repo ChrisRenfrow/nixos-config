@@ -7,7 +7,7 @@ let
   cfg = config.system.locale;
 
   locations = {
-    San_Francisco = {
+    "San Francisco" = {
       latitude = 37.773972;
       longitude = -122.431297;
       timeZone = "America/Los_Angeles";
