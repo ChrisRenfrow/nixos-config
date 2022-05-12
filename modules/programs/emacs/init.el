@@ -42,7 +42,7 @@
   :ensure t
   :init
   (setq evil-want-integration t
-	evil-want-keybinding nil)
+        evil-want-keybinding nil)
   :config
   (evil-mode 1)
   ;; Use visual line motions outside of visual-line-mode buffers
@@ -71,14 +71,27 @@
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "load new theme"))
 
+(use-package hydra
+  :ensure t)
+
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("d" (text-scale-adjust 0) "default" :exit t)
+  ("f" nil "finished" :exit t))
+
+(cr/leader-key
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
+
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		treemacs-mode-hook))
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package doom-themes
@@ -111,19 +124,19 @@
 (use-package ivy
   :ensure t
   :bind (("C-s" . swiper)
-	 :map ivy-minibuffer-map
-	 ("TAB" . ivy-alt-done)
-	 ("C-j" . ivy-next-line)
-	 ("C-k" . ivy-previous-line)
-	 :map ivy-switch-buffer-map
-	 ("C-j" . ivy-next-line)
-	 ("C-k" . ivy-previous-line)
-	 ("C-l" . ivy-done)
-	 ("C-d" . ivy-switch-buffer-kill)
-	 :map ivy-reverse-i-search-map
-	 ("C-j" . ivy-next-line)
-	 ("C-k" . ivy-previous-line)
-	 ("C-d" . ivy-reverse-i-search))
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search))
   :config
   (setq ivy-initial-inputs-alist nil)
   (ivy-mode 1))
@@ -149,7 +162,7 @@
 (use-package counsel
   :ensure t
   :bind (("M-x" . counsel-M-x)
-	 ("C-x C-f" . counsel-find-file))
+         ("C-x C-f" . counsel-find-file))
   :custom
   (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   :config
@@ -183,7 +196,9 @@
 (defun cr/org-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
-  (visual-line-mode 1))
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
 
 (use-package org
   :ensure t
@@ -192,10 +207,62 @@
   :config
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-graph-column 60)
-  (setq org-startup-folded t)
-  ;; More to come...
+  (setq org-ellipsis "▿"
+        org-fontify-quote-and-verse-blocks t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 2
+        org-hide-block-startup nil
+        org-src-preserve-indentation nil
+        org-hide-emphasis-markers t
+        org-cycle-separator-lines 2
+        org-startup-folded 'content)
   (cr/org-font-setup))
+
+(use-package org-superstar
+  :ensure t
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :config
+  (setq org-hide-leading-stars t
+        org-superstar-leading-bullet ?\s
+        org-indent-mode-turns-on-hiding-stars nil
+        org-superstar-remove-leading-stars t
+        org-superstar-cycle-headline-bullets nil ; changes cycling behavior
+        org-superstar-headline-bullets-list '("⁙" "⁘" "⁖" "⁚" "‧")))
+
+(defun cr/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :ensure t
+  :hook (org-mode . cr/org-mode-visual-fill))
+
+(use-package toc-org
+  :ensure t
+  :hook ((org-mode . toc-org-mode)
+         (markdown-mode . toc-org-mode))
+  :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
+
+(use-package markdown-mode
+  :ensure t
+  :mode "\\.md\\'"
+  :config
+  (setq markdown-command "marked")
+
+  (defun cr/set-markdown-header-font-sizes ()
+    (dolist (face '((markdown-header-face-1 . 1.5)
+		    (markdown-header-face-2 . 1.2)
+		    (markdown-header-face-3 . 1.1)
+		    (markdown-header-face-4 . 1.0)
+		    (markdown-header-face-5 . 1.0)))
+      (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+
+  (defun cr/markdown-mode-hook ()
+    (cr/set-markdown-header-font-sizes))
+
+  (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages
@@ -272,10 +339,11 @@
     :ensure t
     :after lsp-mode
     :hook (lsp-mode . company-mode)
-    :bind (:map company-active-map
-	   ("<tab>" . company-complete-selection))
-	  (:map lsp-mode-map
-	   ("<tab>" . company-indent-or-complete-common))
+    :bind
+    (:map company-active-map
+          ("<tab>" . company-complete-selection))
+    (:map lsp-mode-map
+          ("<tab>" . company-indent-or-complete-common))
     :custom
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0))
@@ -330,6 +398,6 @@
 (use-package rainbow-mode
   :ensure t
   :hook (org-mode
-	 emacs-lisp-mode
-	 web-mode
-	 js2-mode))
+         emacs-lisp-mode
+         web-mode
+         js2-mode))

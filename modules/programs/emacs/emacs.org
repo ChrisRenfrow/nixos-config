@@ -1,10 +1,43 @@
 #+title: My Literal Emacs Configuration
 #+author: Chris Renfrow
+#+startup: show2levels
 
-* Overview
+* About                                                            :noexport:
 
 This Emacs config assumes everything is available via the load-path as
 it will be under Nix.
+
+* Table of Contents                                                     :TOC:
+- [[#early-initialization][Early-initialization]]
+  - [[#startup][Startup]]
+  - [[#native-comp][Native Comp]]
+  - [[#ui][UI]]
+- [[#base][Base]]
+  - [[#package-management][Package Management]]
+  - [[#some-variables][Some Variables]]
+  - [[#no-littering][No Littering]]
+  - [[#fonts][Fonts]]
+  - [[#keybindings][Keybindings]]
+- [[#ui-1][UI]]
+  - [[#line-numbers][Line Numbers]]
+  - [[#color-theming][Color Theming]]
+  - [[#modeline][Modeline]]
+  - [[#which-key][Which Key]]
+  - [[#ivy-counsel--swiper][Ivy, Counsel, & Swiper]]
+- [[#org-mode][Org Mode]]
+  - [[#base-1][Base]]
+  - [[#extra][Extra]]
+- [[#code][Code]]
+  - [[#treemacs][Treemacs]]
+  - [[#languages][Languages]]
+  - [[#magit][Magit]]
+  - [[#company-mode][Company Mode]]
+  - [[#projectile][Projectile]]
+  - [[#perspective][Perspective]]
+  - [[#commenting][Commenting]]
+  - [[#rainbows][Rainbows]]
+- [[#terminals][Terminals]]
+- [[#file-management][File Management]]
 
 * Early-initialization
 
@@ -14,7 +47,6 @@ Measure and display startup time alongside number of garbage
 collections.
 
 #+begin_src emacs-lisp :tangle early-init.el
-
   (defun cr/display-startup-time ()
     (message "Emacs loaded in %s with %d garbage collections."
       (format "%.2f seconds"
@@ -23,7 +55,6 @@ collections.
               gcs-done))
 
   (add-hook 'emacs-startup-hook #'cr/display-startup-time)
-
 #+end_src
 
 Ideally I would fine-tune this but after faffing about with it too
@@ -48,7 +79,6 @@ Everything is already built by Nix.
 ** UI
 
 #+begin_src emacs-lisp :tangle early-init.el
-
   (setq inhibit-startup-message t)
   (setq initial-scratch-message nil)
 
@@ -59,7 +89,6 @@ Everything is already built by Nix.
 
   (setq visible-bell t)
   (set-fringe-mode 10)
-
 #+end_src
 
 * Base
@@ -81,7 +110,6 @@ it's packaging features during compilation and runtime. We're really
 only using it to define the list of packages we'd like nix to fetch.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (eval-when-compile
     (require 'use-package))
 
@@ -89,7 +117,6 @@ only using it to define the list of packages we'd like nix to fetch.
     (setq package-enable-at-startup nil)
     (setq use-package-ensure-function 'ignore)
     (setq package-archives nil))
-
 #+end_src
 
 ** Some Variables
@@ -98,7 +125,6 @@ Just some helpful values and variables like my name, email, and
 default font sizes. May expand later.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (setq name "Chris Renfrow"
         email "dev@chrisrenfrow.me")
 
@@ -108,8 +134,7 @@ default font sizes. May expand later.
     "Default font-size for variable pitch")
 
   (defvar cr/projects-base-directory "~/projects/code"
-    "The location I keep my code projects, mostly used by =projectile=") 
-
+    "The location I keep my code projects, mostly used by =projectile=")
 #+end_src
 
 ** No Littering
@@ -119,7 +144,6 @@ exactly what packages are generating these random files, I'll just
 call for some help from [[https://github.com/emacscollective/no-littering/blob/master/no-littering.el][no-littering]].
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package no-littering
     :ensure t
     :init
@@ -130,7 +154,6 @@ call for some help from [[https://github.com/emacscollective/no-littering/blob/m
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
     ;; Move custom into it's own file
     (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
-
 #+end_src
 
 ** Fonts
@@ -138,21 +161,20 @@ call for some help from [[https://github.com/emacscollective/no-littering/blob/m
 I'm using [[https://typeof.net/Iosevka/][Iosevka]] throughout.
 
 #+begin_src emacs-lisp :tangle init.el
-
   ;; Fixed pitch
   (set-face-attribute 'default nil :font "Iosevka" :height cr/default-font-size)
   ;; Variable pitch
   (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height cr/default-variable-font-size :weight 'regular)
-
 #+end_src
 
 ** Keybindings
+
+*** evil-mode
 
 I like my Vim-like key-bindings and functionality. So we're using
 [[https://evil.readthedocs.io/en/latest/overview.html][extensible vi l​ayer]] (a.k.a. evil).
 
 #+begin_src emacs-lisp :tangle init.el
-
   ;; Make ESC quit prompts
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -160,7 +182,7 @@ I like my Vim-like key-bindings and functionality. So we're using
     :ensure t
     :init
     (setq evil-want-integration t
-	  evil-want-keybinding nil)
+          evil-want-keybinding nil)
     :config
     (evil-mode 1)
     ;; Use visual line motions outside of visual-line-mode buffers
@@ -169,14 +191,19 @@ I like my Vim-like key-bindings and functionality. So we're using
 
     (evil-set-initial-state 'messages-buffer-mode 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal))
+#+end_src
 
+*** evil-collection
+
+#+begin_src emacs-lisp :tangle init.el
   (use-package evil-collection
     :ensure t
     :after evil
     :config
     (evil-collection-init))
-
 #+end_src
+
+*** general
 
 I'm also making use of [[https://github.com/noctuid/general.el][general]] to make it easy to define keybindings
 as I go.
@@ -198,27 +225,47 @@ as I go.
 
 #+end_src
 
+*** hydra
+
+Install hydra and use it to define a helpful text-scale interface.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package hydra
+    :ensure t)
+
+  (defhydra hydra-text-scale (:timeout 4)
+    "scale text"
+    ("j" text-scale-increase "in")
+    ("k" text-scale-decrease "out")
+    ("d" (text-scale-adjust 0) "default" :exit t)
+    ("f" nil "finished" :exit t))
+
+  (cr/leader-key
+    "ts" '(hydra-text-scale/body :which-key "scale text"))
+#+end_src
+
 * UI
 
 ** Line Numbers
 
-#+begin_src emacs-lisp :tangle init.el
+Enable line-numbers globally, and then disable them for select modes.
 
+#+begin_src emacs-lisp :tangle init.el
   (column-number-mode)
   (global-display-line-numbers-mode t)
 
   ;; Disable line numbers for some modes
   (dolist (mode '(org-mode-hook
-		  term-mode-hook
-		  shell-mode-hook
-		  treemacs-mode-hook))
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
 #+end_src
+
 ** Color Theming
 
-Here I use =doom-themes= to give myself plenty of variety when it comes
-to theming. I've been enjoying light themes lately, so I set my
+Here I use =doom-themes= to give myself plenty of variety when it
+comes to theming. I've been enjoying light themes lately, so I set my
 default to =doom-solarized-light=.
 
 #+begin_src emacs-lisp :tangle init.el
@@ -266,7 +313,7 @@ Reduce minor-mode clutter in the modeline.
   (use-package minions
     :ensure t
     :config (minions-mode 1))
-  
+
 #+end_src
 
 ** Which Key
@@ -305,19 +352,19 @@ setting =ivy-initial-inputs-alist= to ~nil~.
   (use-package ivy
     :ensure t
     :bind (("C-s" . swiper)
-	   :map ivy-minibuffer-map
-	   ("TAB" . ivy-alt-done)
-	   ("C-j" . ivy-next-line)
-	   ("C-k" . ivy-previous-line)
-	   :map ivy-switch-buffer-map
-	   ("C-j" . ivy-next-line)
-	   ("C-k" . ivy-previous-line)
-	   ("C-l" . ivy-done)
-	   ("C-d" . ivy-switch-buffer-kill)
-	   :map ivy-reverse-i-search-map
-	   ("C-j" . ivy-next-line)
-	   ("C-k" . ivy-previous-line)
-	   ("C-d" . ivy-reverse-i-search))
+           :map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           ("C-l" . ivy-done)
+           ("C-d" . ivy-switch-buffer-kill)
+           :map ivy-reverse-i-search-map
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           ("C-d" . ivy-reverse-i-search))
     :config
     (setq ivy-initial-inputs-alist nil)
     (ivy-mode 1))
@@ -379,7 +426,7 @@ equivalents, namely =M-x= and =C-x C-f=.
   (use-package counsel
     :ensure t
     :bind (("M-x" . counsel-M-x)
-	   ("C-x C-f" . counsel-find-file))
+           ("C-x C-f" . counsel-find-file))
     :custom
     (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
     :config
@@ -389,14 +436,17 @@ equivalents, namely =M-x= and =C-x C-f=.
 
 * Org Mode
 
-** Font Setup
+** Base
 
-This makes org-mode headings more distinct by changing their height to
-match their heading level. It also makes sure that source blocks and
-such use fixed-width faces.
+Base org-mode configuration.
+
+*** Font
+
+This makes org-mode headings more distinct by changing their face and
+height to match their heading level. It also makes sure that source
+blocks and such use fixed-width faces.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (defun cr/org-font-setup ()
       ;; Set faces for heading levels
       (dolist (face '((org-level-1 . 1.2)
@@ -421,17 +471,20 @@ such use fixed-width faces.
       (set-face-attribute 'org-checkbox nil              :inherit 'fixed-pitch)
       (set-face-attribute 'line-number nil               :inherit 'fixed-pitch)
       (set-face-attribute 'line-number-current-line nil  :inherit 'fixed-pitch))
-
 #+end_src
 
-** Base
+*** org
+
+Set some org-mode configuration values to tailor it's presentation and
+behavior.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (defun cr/org-setup ()
     (org-indent-mode)
     (variable-pitch-mode 1)
-    (visual-line-mode 1))
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
 
   (use-package org
     :ensure t
@@ -440,28 +493,30 @@ such use fixed-width faces.
     :config
     (require 'org-habit)
     (add-to-list 'org-modules 'org-habit)
-    (setq org-habit-graph-column 60)
-    (setq org-startup-folded t)
-    ;; More to come...
+    (setq org-ellipsis "▿"
+          org-fontify-quote-and-verse-blocks t
+          org-src-tab-acts-natively t
+          org-edit-src-content-indentation 2
+          org-hide-block-startup nil
+          org-src-preserve-indentation nil
+          org-hide-emphasis-markers t
+          org-cycle-separator-lines 2
+          org-startup-folded 'content)
     (cr/org-font-setup))
-
 #+end_src
 
-** Babel
-
-*** Babel Languages
+*** Babel
+**** Babel Languages
 
 #+begin_src emacs-lisp :tangle init.el
-
   (with-eval-after-load 'org
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((emacs-lisp . t)))
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
-
 #+end_src
 
-** Structure Templates
+**** Structure Templates
 
 Adds org structure templates for languages I commonly work with. Also
 enables easy-templates, which turns the shortcut to generate an Emacs
@@ -470,7 +525,6 @@ Lisp source code block from =C-c C-, l e= to just =< e l TAB=.
 *Note:* easy-templates don't seem to work?
 
 #+begin_src emacs-lisp :tangle init.el
-
   (with-eval-after-load 'org
     ;; Required as of Org 9.2 to use easy-templates
     (require 'org-tempo)
@@ -484,7 +538,82 @@ Lisp source code block from =C-c C-, l e= to just =< e l TAB=.
     (add-to-list 'org-structure-template-alist '("hs" . "src haskell"))
     (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
     (add-to-list 'org-structure-template-alist '("json" . "src json")))
+#+end_src
 
+** Extra
+
+Extra org functionality.
+
+*** org-superstar
+
+Superstar replaces org-mode heading markers with whatever symbols one
+prefers.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package org-superstar
+    :ensure t
+    :after org
+    :hook (org-mode . org-superstar-mode)
+    :config
+    (setq org-hide-leading-stars t
+          org-superstar-leading-bullet ?\s
+          org-indent-mode-turns-on-hiding-stars nil
+          org-superstar-remove-leading-stars t
+          org-superstar-cycle-headline-bullets nil ; changes cycling behavior
+          org-superstar-headline-bullets-list '("⁙" "⁘" "⁖" "⁚" "‧")))
+#+end_src
+
+*** Center Org Mode Buffers
+
+Make it so org-mode buffers are centered using =visual-fill-column=.
+
+#+begin_src emacs-lisp :tangle init.el
+  (defun cr/org-mode-visual-fill ()
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :ensure t
+    :hook (org-mode . cr/org-mode-visual-fill))
+#+end_src
+
+*** toc-org
+
+Dynamically generates a table of contents for org-files. Nice for
+larger org files like this one.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package toc-org
+    :ensure t
+    :hook ((org-mode . toc-org-mode)
+           (markdown-mode . toc-org-mode))
+    :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
+#+end_src
+
+*** markdown-mode
+
+Not org-mode specific, but shares similarities in utility.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package markdown-mode
+    :ensure t
+    :mode "\\.md\\'"
+    :config
+    (setq markdown-command "marked")
+
+    (defun cr/set-markdown-header-font-sizes ()
+      (dolist (face '((markdown-header-face-1 . 1.5)
+		      (markdown-header-face-2 . 1.2)
+		      (markdown-header-face-3 . 1.1)
+		      (markdown-header-face-4 . 1.0)
+		      (markdown-header-face-5 . 1.0)))
+	(set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+
+    (defun cr/markdown-mode-hook ()
+      (cr/set-markdown-header-font-sizes))
+
+    (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
 #+end_src
 
 * Code
@@ -495,7 +624,6 @@ Enable and customize treemacs, a file browser buffer. Also add several
 treemacs extensions that compliment other packages in use.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package treemacs
     :ensure t)
 
@@ -503,7 +631,7 @@ treemacs extensions that compliment other packages in use.
     :ensure t
     :after (treemacs all-the-icons)
     :config (treemacs-load-theme "all-the-icons"))
-  
+
   (use-package treemacs-evil
     :ensure t
     :after (treemacs evil))
@@ -520,7 +648,6 @@ treemacs extensions that compliment other packages in use.
     :ensure t
     :after (treemacs persp-mode)
     :config (treemacs-set-scope-type 'Perspectives))
-
 #+end_src
 
 ** Languages
@@ -533,7 +660,6 @@ There's a lot going on with lsp-mode, so we've set a keymap prefix
 paired with which-key integration to make it easy to explore.
 
 #+begin_src emacs-lisp :tangle init.el
- 
     (use-package lsp-mode
       :ensure t
       :commands (lsp lsp-deferred)
@@ -541,7 +667,6 @@ paired with which-key integration to make it easy to explore.
       (setq lsp-keymap-prefix "C-c l")
       :config
       (lsp-enable-which-key-integration t))
-
 #+end_src
 
 *** lsp-ui
@@ -550,36 +675,30 @@ Adds some UI enhancements for =lsp-mode= to give us that
 comfy IDE vibe.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package lsp-ui
     :ensure t
     :hook (lsp-mode . lsp-ui-mode)
     :custom
     (lsp-ui-doc-position 'bottom))
-
 #+end_src
 
 *** lsp-treemacs
 
-Adds some lsp-specific using =treemacs=, like symbol information, type
+Adds some lsp-specific =treemacs= buffers, like symbol information, type
 hierarchy, and other things one might see in a modern IDE.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package lsp-treemacs
     :ensure t
     :after lsp)
-
 #+end_src
 
 *** lsp-ivy
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package lsp-ivy
     :ensure t
     :after lsp)
-
 #+end_src
 
 *** C
@@ -591,25 +710,23 @@ hierarchy, and other things one might see in a modern IDE.
 ** Magit
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package magit
     :ensure t
     :commands magit-status)
-
 #+end_src
 
 ** Company Mode
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package company
       :ensure t
       :after lsp-mode
       :hook (lsp-mode . company-mode)
-      :bind (:map company-active-map
-	     ("<tab>" . company-complete-selection))
-	    (:map lsp-mode-map
-	     ("<tab>" . company-indent-or-complete-common))
+      :bind
+      (:map company-active-map
+            ("<tab>" . company-complete-selection))
+      (:map lsp-mode-map
+            ("<tab>" . company-indent-or-complete-common))
       :custom
       (company-minimum-prefix-length 1)
       (company-idle-delay 0.0))
@@ -617,7 +734,6 @@ hierarchy, and other things one might see in a modern IDE.
     (use-package company-box
       :ensure t
       :hook (company-mode . company-box-mode))
-  
 #+end_src
 
 ** Projectile
@@ -625,7 +741,6 @@ hierarchy, and other things one might see in a modern IDE.
 Project management library.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (defun cr/switch-project-action ()
     "Switch to a perspective named after the project, start `magit-status' and `treemacs'."
     (persp-switch (projectile-project-name))
@@ -649,7 +764,6 @@ Project management library.
     :ensure t
     :after projectile
     :config (counsel-projectile-mode))
-
 #+end_src
 
 ** Perspective
@@ -659,7 +773,6 @@ is kept in it's assigned perspective, making it easy to switch between
 several projects during one session.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package perspective
     :ensure t
     :bind (("C-M-k" . persp-switch)
@@ -670,7 +783,6 @@ several projects during one session.
     (persp-mode-prefix-key (kbd "C-c M-p"))
     :init
     (persp-mode))
-
 #+end_src
 
 ** Commenting
@@ -678,11 +790,9 @@ several projects during one session.
 Adds predictable comment region functionality for evil mode users.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package evil-nerd-commenter
     :ensure t
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
 #+end_src
 
 ** Rainbows
@@ -694,11 +804,9 @@ Who doesn't like rainbows?
 Add rainbow delimiters to make it easier to keep track of nesting.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package rainbow-delimiters
     :ensure t
     :hook (prog-mode . rainbow-delimiters-mode))
-
 #+end_src
 
 *** rainbow-mode
@@ -707,14 +815,12 @@ Make the background of color definitions (hex, rbg, etc.) reflect the
 color they describe. Enable in a few select modes.
 
 #+begin_src emacs-lisp :tangle init.el
-
   (use-package rainbow-mode
     :ensure t
     :hook (org-mode
-	   emacs-lisp-mode
-	   web-mode
-	   js2-mode))
-
+           emacs-lisp-mode
+           web-mode
+           js2-mode))
 #+end_src
 
 * Terminals
