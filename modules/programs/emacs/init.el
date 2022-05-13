@@ -19,6 +19,8 @@
 (defvar cr/projects-base-directory "~/projects/code"
   "The location I keep my code projects, mostly used by =projectile=")
 
+(setq-default tab-width 2)
+
 (use-package no-littering
   :ensure t
   :init
@@ -218,6 +220,26 @@
         org-startup-folded 'content)
   (cr/org-font-setup))
 
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)))
+  (push '("conf-unix" . conf-unix) org-src-lang-modes))
+
+(with-eval-after-load 'org
+  ;; Required as of Org 9.2 to use easy-templates
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("nix" . "src nix"))
+  (add-to-list 'org-structure-template-alist '("clang" . "src c"))
+  (add-to-list 'org-structure-template-alist '("rs" . "src rust"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("hs" . "src haskell"))
+  (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
+  (add-to-list 'org-structure-template-alist '("json" . "src json")))
+
 (use-package org-superstar
   :ensure t
   :after org
@@ -257,35 +279,25 @@
 		    (markdown-header-face-3 . 1.1)
 		    (markdown-header-face-4 . 1.0)
 		    (markdown-header-face-5 . 1.0)))
-      (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+(set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
 
   (defun cr/markdown-mode-hook ()
     (cr/set-markdown-header-font-sizes))
 
   (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
 
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)))
-  (push '("conf-unix" . conf-unix) org-src-lang-modes))
-
-(with-eval-after-load 'org
-  ;; Required as of Org 9.2 to use easy-templates
-  (require 'org-tempo)
-
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("nix" . "src nix"))
-  (add-to-list 'org-structure-template-alist '("clang" . "src c"))
-  (add-to-list 'org-structure-template-alist '("rs" . "src rust"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python"))
-  (add-to-list 'org-structure-template-alist '("hs" . "src haskell"))
-  (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
-  (add-to-list 'org-structure-template-alist '("json" . "src json")))
-
 (use-package treemacs
-  :ensure t)
+  :ensure t
+  :config
+  (treemacs-filewatch-mode 1)
+  (treemacs-follow-mode 1)
+  (treemacs-project-follow-mode 1)
+  (treemacs-git-mode 'deferred)
+  (treemacs-indent-guide-mode 1))
+
+(use-package treemacs-icons-dired
+  :ensure t
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 (use-package treemacs-all-the-icons
   :ensure t
@@ -330,6 +342,16 @@
 (use-package lsp-ivy
   :ensure t
   :after lsp)
+
+(use-package rust-mode
+  :ensure t
+  :mode "\\.rs\\'"
+  :init (setq rust-format-on-save t))
+
+(use-package haskell-mode
+  :ensure t
+  :mode "\\.hs\\'"
+  :init (setq haskell-program-name "ghci"))
 
 (use-package magit
   :ensure t

@@ -15,6 +15,7 @@ it will be under Nix.
 - [[#base][Base]]
   - [[#package-management][Package Management]]
   - [[#some-variables][Some Variables]]
+  - [[#tab-behavior][Tab Behavior]]
   - [[#no-littering][No Littering]]
   - [[#fonts][Fonts]]
   - [[#keybindings][Keybindings]]
@@ -40,7 +41,6 @@ it will be under Nix.
 - [[#file-management][File Management]]
 
 * Early-initialization
-
 ** Startup
 
 Measure and display startup time alongside number of garbage
@@ -135,6 +135,14 @@ default font sizes. May expand later.
 
   (defvar cr/projects-base-directory "~/projects/code"
     "The location I keep my code projects, mostly used by =projectile=")
+#+end_src
+
+** Tab Behavior
+
+Make =tab-width= narrower globally.
+
+#+begin_src emacs-lisp :tangle init.el
+  (setq-default tab-width 2)
 #+end_src
 
 ** No Littering
@@ -617,7 +625,6 @@ Not org-mode specific, but shares similarities in utility.
 #+end_src
 
 * Code
-
 ** Treemacs
 
 Enable and customize treemacs, a file browser buffer. Also add several
@@ -625,7 +632,17 @@ treemacs extensions that compliment other packages in use.
 
 #+begin_src emacs-lisp :tangle init.el
   (use-package treemacs
-    :ensure t)
+    :ensure t
+    :config
+    (treemacs-filewatch-mode 1)
+    (treemacs-follow-mode 1)
+    (treemacs-project-follow-mode 1)
+    (treemacs-git-mode 'deferred)
+    (treemacs-indent-guide-mode 1))
+
+  (use-package treemacs-icons-dired
+    :ensure t
+    :hook (dired-mode . treemacs-icons-dired-enable-once))
 
   (use-package treemacs-all-the-icons
     :ensure t
@@ -651,7 +668,6 @@ treemacs extensions that compliment other packages in use.
 #+end_src
 
 ** Languages
-
 *** Language Server Protocol (LSP)
 
 Also known as "the one cool thing Microsoft ever did".
@@ -705,7 +721,21 @@ hierarchy, and other things one might see in a modern IDE.
 
 *** Rust
 
+#+begin_src emacs-lisp :tangle init.el
+  (use-package rust-mode
+    :ensure t
+    :mode "\\.rs\\'"
+    :init (setq rust-format-on-save t))
+#+end_src
+
 *** Haskell
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package haskell-mode
+    :ensure t
+    :mode "\\.hs\\'"
+    :init (setq haskell-program-name "ghci"))
+#+end_src
 
 ** Magit
 

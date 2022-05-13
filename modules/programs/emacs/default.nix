@@ -66,6 +66,8 @@ in {
         ## auctex
         texinfo
         texlive.combined.scheme-full
+        ## Misc
+        python39
       ];
     };
   };
