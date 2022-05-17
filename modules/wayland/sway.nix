@@ -10,7 +10,6 @@ in {
   config = mkIf cfg.enable {
     programs.sway = {
       enable = true;
-      wrapperFeatures.gtk = true;
       # TODO: Make these configurable?
       extraPackages = with pkgs; [
         swaylock
@@ -30,6 +29,8 @@ in {
         grim
         brightnessctl
         playerctl
+        xdg-desktop-portal
+        xdg-desktop-portal-wlr
       ];
       # extraSessionCommands = ''
       # # https://github.com/swaywm/wlroots/blob/master/docs/env_vars.md
@@ -51,10 +52,6 @@ in {
       portal = {
         enable = true;
         gtkUsePortal = true;
-        extraPortals = with pkgs; [
-          xdg-desktop-portal-wlr
-          xdg-desktop-portal-gtk
-        ];
         wlr = {
           enable = true;
           settings = {
@@ -65,7 +62,6 @@ in {
             };
           };
         };
-
       };
     };
 
@@ -75,8 +71,8 @@ in {
         enable = true;
         settings.default_session = {
           command = "${
-              makeBinPath [ pkgs.greetd.tuigreet ]
-            }/tuigreet --asterisks --time --cmd sway";
+            makeBinPath [ pkgs.greetd.tuigreet ]
+          }/tuigreet --asterisks --time --cmd sway";
           user = "${config.system.user.name}";
         };
       };
@@ -88,6 +84,5 @@ in {
         wireplumber.enable = true;
       };
     };
-
   };
 }
