@@ -26,8 +26,17 @@ it will be under Nix.
   - [[#which-key][Which Key]]
   - [[#ivy-counsel--swiper][Ivy, Counsel, & Swiper]]
 - [[#org-mode][Org Mode]]
-  - [[#base-1][Base]]
-  - [[#extra][Extra]]
+  - [[#font][Font]]
+  - [[#setup][Setup]]
+  - [[#org-superstar][org-superstar]]
+  - [[#markdown-mode][markdown-mode]]
+  - [[#visual-fill][Visual fill]]
+  - [[#toc-org][toc-org]]
+  - [[#babel][Babel]]
+  - [[#evil-org][evil-org]]
+  - [[#org-roam][org-roam]]
+  - [[#org-drill][org-drill]]
+  - [[#org-pomodoro][org-pomodoro]]
 - [[#code][Code]]
   - [[#treemacs][Treemacs]]
   - [[#languages][Languages]]
@@ -444,11 +453,7 @@ equivalents, namely =M-x= and =C-x C-f=.
 
 * Org Mode
 
-** Base
-
-Base org-mode configuration.
-
-*** Font
+** Font
 
 This makes org-mode headings more distinct by changing their face and
 height to match their heading level. It also makes sure that source
@@ -481,7 +486,7 @@ blocks and such use fixed-width faces.
       (set-face-attribute 'line-number-current-line nil  :inherit 'fixed-pitch))
 #+end_src
 
-*** org
+** Setup
 
 Set some org-mode configuration values to tailor it's presentation and
 behavior.
@@ -511,10 +516,90 @@ behavior.
           org-cycle-separator-lines 2
           org-startup-folded 'content)
     (cr/org-font-setup))
+
+  (cr/leader-key
+    "o" '(:ignore t :which-key "org")
+    "oi" '(:ignore t :which-key "insert")
+    "oil" '(org-insert-link :whick-key "insert link")
+    "oa" '(org-agenda :which-key "status")
+    "ot" '(org-todo-list :which-key "todos")
+    "oc" '(org-capture t :which-key "capture")
+    "ox" '(org-export-dispatch t :which-key "export"))
 #+end_src
 
-*** Babel
-**** Babel Languages
+** org-superstar
+
+Superstar replaces org-mode heading markers with whatever symbols one
+prefers.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package org-superstar
+    :ensure t
+    :after org
+    :hook (org-mode . org-superstar-mode)
+    :config
+    (setq org-hide-leading-stars t
+          org-superstar-leading-bullet ?\s
+          org-indent-mode-turns-on-hiding-stars nil
+          org-superstar-remove-leading-stars t
+          org-superstar-cycle-headline-bullets nil ; changes cycling behavior
+          org-superstar-headline-bullets-list '("⁙" "⁘" "⁖" "⁚" "‧")))
+#+end_src
+
+** markdown-mode
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package markdown-mode
+    :ensure t
+    :mode "\\.md\\'"
+    :config
+    (setq markdown-command "marked")
+
+    (defun cr/set-markdown-header-font-sizes ()
+      (dolist (face '((markdown-header-face-1 . 1.5)
+          (markdown-header-face-2 . 1.2)
+          (markdown-header-face-3 . 1.1)
+          (markdown-header-face-4 . 1.0)
+          (markdown-header-face-5 . 1.0)))
+        (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+	
+    (defun cr/markdown-mode-hook ()
+      (cr/set-markdown-header-font-sizes))
+    (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
+#+end_src
+
+** Visual fill
+
+Make it so org-mode and markdown-mode buffers are centered using
+=visual-fill-column=.
+
+#+begin_src emacs-lisp :tangle init.el
+  (defun cr/doc-mode-visual-fill ()
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :ensure t
+    :hook ((org-mode . cr/doc-mode-visual-fill)
+           (markdown-mode . cr/doc-mode-visual-fill)))
+#+end_src
+
+** toc-org
+
+Dynamically generates a table of contents for org-files. Nice for
+larger org files like this one.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package toc-org
+    :ensure t
+    :hook ((org-mode . toc-org-mode)
+           (markdown-mode . toc-org-mode))
+    :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
+#+end_src
+
+** Babel
+*** Babel Languages
 
 #+begin_src emacs-lisp :tangle init.el
   (with-eval-after-load 'org
@@ -524,7 +609,7 @@ behavior.
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
 #+end_src
 
-**** Structure Templates
+*** Structure Templates
 
 Adds org structure templates for languages I commonly work with. Also
 enables easy-templates, which turns the shortcut to generate an Emacs
@@ -548,80 +633,117 @@ Lisp source code block from =C-c C-, l e= to just =< e l TAB=.
     (add-to-list 'org-structure-template-alist '("json" . "src json")))
 #+end_src
 
-** Extra
+** evil-org
 
-Extra org functionality.
-
-*** org-superstar
-
-Superstar replaces org-mode heading markers with whatever symbols one
-prefers.
-
-#+begin_src emacs-lisp :tangle init.el
-  (use-package org-superstar
+#+begin_src emacs-lisp
+  (use-package "evil-org"
     :ensure t
     :after org
-    :hook (org-mode . org-superstar-mode)
+    :hook
+    ((org-mode . evil-org-mode)
+     (evil-org-mode . (lambda ()
+                        (evil-org-set-key-theme
+                         '(navigation todo insert textobjects additional)))))
     :config
-    (setq org-hide-leading-stars t
-          org-superstar-leading-bullet ?\s
-          org-indent-mode-turns-on-hiding-stars nil
-          org-superstar-remove-leading-stars t
-          org-superstar-cycle-headline-bullets nil ; changes cycling behavior
-          org-superstar-headline-bullets-list '("⁙" "⁘" "⁖" "⁚" "‧")))
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 #+end_src
 
-*** Center Org Mode Buffers
+** org-roam
 
-Make it so org-mode buffers are centered using =visual-fill-column=.
-
-#+begin_src emacs-lisp :tangle init.el
-  (defun cr/org-mode-visual-fill ()
-    (setq visual-fill-column-width 100
-          visual-fill-column-center-text t)
-    (visual-fill-column-mode 1))
-
-  (use-package visual-fill-column
-    :ensure t
-    :hook (org-mode . cr/org-mode-visual-fill))
-#+end_src
-
-*** toc-org
-
-Dynamically generates a table of contents for org-files. Nice for
-larger org files like this one.
+Org roam, a.k.a. my second-brain.
 
 #+begin_src emacs-lisp :tangle init.el
-  (use-package toc-org
+  (use-package org-roam
     :ensure t
-    :hook ((org-mode . toc-org-mode)
-           (markdown-mode . toc-org-mode))
-    :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
-#+end_src
-
-*** markdown-mode
-
-Not org-mode specific, but shares similarities in utility.
-
-#+begin_src emacs-lisp :tangle init.el
-  (use-package markdown-mode
-    :ensure t
-    :mode "\\.md\\'"
+    :init
+    (setq org-roam-v2-ack t
+          cr/daily-note-filename "%<%Y-%m-%d>.org"
+          cr/daily-note-header "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")
+    :custom
+    (org-roam-directory "~/documents/notes/roam/")
+    (org-roam-dailies-directory (concat org-roam-directory "journal/"))
+    (org-roam-completion-everywhere t)
+    (org-roam-capture-templates
+     '(("d" "default" plain "%?"
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                           "#+title: ${title}\n")
+        :unnarrowed t)))
+    (org-roam-dailies-capture-templates
+     `(("d" "default" entry
+        "* %?"
+        :if-new (file+head ,cr/daily-note-filename
+                           ,cr/daily-note-header))
+       ("t" "task" entry
+        "* TODO %?\n\t%U\n\t%a\n\t%i"
+        :if-new (file+head+olp ,cr/daily-note-filename
+                               ,cr/daily-note-header
+                               ("Tasks"))
+        :empty-lines 1)
+       ("l" "log entry" entry
+        "* %<%H:%M> - %?"
+        :if-new (file+head+olp ,cr/daily-note-filename
+                               ,cr/daily-note-header
+                               ("Log")))
+       ("j" "journal" entry
+        "* %<%H:%M> - Journal\t:journal:\n\n%?\n\n"
+        :if-new (file+head+olp ,cr/daily-note-filename
+                               ,cr/daily-note-header
+                               ("Log")))
+       ("m" "meeting" entry
+        "* %<%H:%M> - %^{Meeting Title}\t:meetings:\n\n%?\n\n"
+        :if-new (file+head+olp ,cr/daily-note-filename
+                               ,cr/daily-note-header
+                               ("Log")))))
+    :bind
+    (("C-c n l" . org-roam-buffer-toggle)
+     ("C-c n f" . org-roam-node-find)
+     ("C-c n d" . org-roam-dailies-find-date)
+     ("C-c n c" . org-roam-dailies-capture-today)
+     ("C-c n C r" . org-roam-dailies-capture-tomorrow)
+     ("C-c n t" . org-roam-dailies-goto-today)
+     ("C-c n y" . org-roam-dailies-goto-yesterday)
+     ("C-c n r" . org-roam-dailies-goto-tomorrow)
+     ("C-c n g" . org-roam-graph)
+     :map org-mode-map
+     (("C-c n i" . org-roam-node-insert)
+     ;("C-c n I" . org-roam-insert-immediate)
+      ))
     :config
-    (setq markdown-command "marked")
+    (org-roam-db-autosync-mode))
+#+end_src
 
-    (defun cr/set-markdown-header-font-sizes ()
-      (dolist (face '((markdown-header-face-1 . 1.5)
-		      (markdown-header-face-2 . 1.2)
-		      (markdown-header-face-3 . 1.1)
-		      (markdown-header-face-4 . 1.0)
-		      (markdown-header-face-5 . 1.0)))
-	(set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+** org-drill
 
-    (defun cr/markdown-mode-hook ()
-      (cr/set-markdown-header-font-sizes))
+#+begin_src emacs-lisp :tangle init.el
+  (use-package org-drill
+    :ensure t
+    :config
+    (setq org-roam-db-node-include-function
+          (lambda () (not (member "drill" (org-get-tags))))))
 
-    (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
+  (cr/leader-key
+    "od" '(:ignore t :which-key "org-drill")
+    "odd" '(org-drill :which-key "drill")
+    "odr" '(org-drill-resume :which-key "resume"))
+#+end_src
+
+** org-pomodoro
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package org-pomodoro
+    :ensure t
+    :after org
+    :config
+    (setq org-pomodoro-manual-break t
+          org-pomodoro-keep-killed-time t
+          org-pomodoro-start-sound "~/.emacs.d/sounds/focus_bell.wav"
+          org-pomodoro-short-break-sound "~/.emacs.d/sounds/three_beeps.wav"
+          org-pomodoro-long-break-sound "~/.emacs.d/sounds/three_beeps.wav"
+          org-pomodoro-finished-sound "~/.emacs.d/sounds/meditation_bell.wav"))
+
+  (cr/leader-key
+   "op" '(org-pomodoro :which-key "pomodoro"))
 #+end_src
 
 * Code
@@ -676,13 +798,13 @@ There's a lot going on with lsp-mode, so we've set a keymap prefix
 paired with which-key integration to make it easy to explore.
 
 #+begin_src emacs-lisp :tangle init.el
-    (use-package lsp-mode
-      :ensure t
-      :commands (lsp lsp-deferred)
-      :init
-      (setq lsp-keymap-prefix "C-c l")
-      :config
-      (lsp-enable-which-key-integration t))
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :config
+    (lsp-enable-which-key-integration t))
 #+end_src
 
 *** lsp-ui
@@ -718,7 +840,6 @@ hierarchy, and other things one might see in a modern IDE.
 #+end_src
 
 *** C
-
 *** Rust
 
 #+begin_src emacs-lisp :tangle init.el
@@ -768,14 +889,13 @@ hierarchy, and other things one might see in a modern IDE.
 
 ** Projectile
 
-Project management library.
+Projectile is a project management library.
 
 #+begin_src emacs-lisp :tangle init.el
   (defun cr/switch-project-action ()
-    "Switch to a perspective named after the project, start `magit-status' and `treemacs'."
+    "Switch to a perspective named after the project, start `magit-status'."
     (persp-switch (projectile-project-name))
-    (magit-status)
-    (treemacs))
+    (magit-status))
 
   (use-package projectile
     :ensure t
@@ -787,6 +907,12 @@ Project management library.
     (when (file-directory-p "~/projects/code")
       (setq projectile-project-search-path '("~/projects/code")))
     (setq projectile-switch-project-action #'cr/switch-project-action))
+
+  (cr/leader-key
+    "p" '(:ignore t :which-key "projectile")
+    "pa" '(projectile-add-known-project :which-key "make project known to projectile")
+    "pp" '(projectile-switch-project :which-key "switch to project")
+    "pf" '(projectile-find-file :which-key "find file in current project"))
 
   (use-package counsel-projectile
     ;; Extremely slow for some reason, disabling for now

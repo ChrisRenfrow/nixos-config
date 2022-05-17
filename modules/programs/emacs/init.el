@@ -220,6 +220,61 @@
         org-startup-folded 'content)
   (cr/org-font-setup))
 
+(cr/leader-key
+  "o" '(:ignore t :which-key "org")
+  "oi" '(:ignore t :which-key "insert")
+  "oil" '(org-insert-link :whick-key "insert link")
+  "oa" '(org-agenda :which-key "status")
+  "ot" '(org-todo-list :which-key "todos")
+  "oc" '(org-capture t :which-key "capture")
+  "ox" '(org-export-dispatch t :which-key "export"))
+
+(use-package org-superstar
+  :ensure t
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :config
+  (setq org-hide-leading-stars t
+        org-superstar-leading-bullet ?\s
+        org-indent-mode-turns-on-hiding-stars nil
+        org-superstar-remove-leading-stars t
+        org-superstar-cycle-headline-bullets nil ; changes cycling behavior
+        org-superstar-headline-bullets-list '("⁙" "⁘" "⁖" "⁚" "‧")))
+
+(use-package markdown-mode
+  :ensure t
+  :mode "\\.md\\'"
+  :config
+  (setq markdown-command "marked")
+
+  (defun cr/set-markdown-header-font-sizes ()
+    (dolist (face '((markdown-header-face-1 . 1.5)
+        (markdown-header-face-2 . 1.2)
+        (markdown-header-face-3 . 1.1)
+        (markdown-header-face-4 . 1.0)
+        (markdown-header-face-5 . 1.0)))
+      (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+
+  (defun cr/markdown-mode-hook ()
+    (cr/set-markdown-header-font-sizes))
+  (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
+
+(defun cr/doc-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :ensure t
+  :hook ((org-mode . cr/doc-mode-visual-fill)
+         (markdown-mode . cr/doc-mode-visual-fill)))
+
+(use-package toc-org
+  :ensure t
+  :hook ((org-mode . toc-org-mode)
+         (markdown-mode . toc-org-mode))
+  :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
+
 (with-eval-after-load 'org
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -240,51 +295,88 @@
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
-(use-package org-superstar
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t
+        cr/daily-note-filename "%<%Y-%m-%d>.org"
+        cr/daily-note-header "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")
+  :custom
+  (org-roam-directory "~/documents/notes/roam/")
+  (org-roam-dailies-directory (concat org-roam-directory "journal/"))
+  (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)))
+  (org-roam-dailies-capture-templates
+   `(("d" "default" entry
+      "* %?"
+      :if-new (file+head ,cr/daily-note-filename
+                         ,cr/daily-note-header))
+     ("t" "task" entry
+      "* TODO %?\n\t%U\n\t%a\n\t%i"
+      :if-new (file+head+olp ,cr/daily-note-filename
+                             ,cr/daily-note-header
+                             ("Tasks"))
+      :empty-lines 1)
+     ("l" "log entry" entry
+      "* %<%H:%M> - %?"
+      :if-new (file+head+olp ,cr/daily-note-filename
+                             ,cr/daily-note-header
+                             ("Log")))
+     ("j" "journal" entry
+      "* %<%H:%M> - Journal\t:journal:\n\n%?\n\n"
+      :if-new (file+head+olp ,cr/daily-note-filename
+                             ,cr/daily-note-header
+                             ("Log")))
+     ("m" "meeting" entry
+      "* %<%H:%M> - %^{Meeting Title}\t:meetings:\n\n%?\n\n"
+      :if-new (file+head+olp ,cr/daily-note-filename
+                             ,cr/daily-note-header
+                             ("Log")))))
+  :bind
+  (("C-c n l" . org-roam-buffer-toggle)
+   ("C-c n f" . org-roam-node-find)
+   ("C-c n d" . org-roam-dailies-find-date)
+   ("C-c n c" . org-roam-dailies-capture-today)
+   ("C-c n C r" . org-roam-dailies-capture-tomorrow)
+   ("C-c n t" . org-roam-dailies-goto-today)
+   ("C-c n y" . org-roam-dailies-goto-yesterday)
+   ("C-c n r" . org-roam-dailies-goto-tomorrow)
+   ("C-c n g" . org-roam-graph)
+   :map org-mode-map
+   (("C-c n i" . org-roam-node-insert)
+   ;("C-c n I" . org-roam-insert-immediate)
+    ))
+  :config
+  (org-roam-db-autosync-mode))
+
+(use-package org-drill
+  :ensure t
+  :config
+  (setq org-roam-db-node-include-function
+        (lambda () (not (member "drill" (org-get-tags))))))
+
+(cr/leader-key
+  "od" '(:ignore t :which-key "org-drill")
+  "odd" '(org-drill :which-key "drill")
+  "odr" '(org-drill-resume :which-key "resume"))
+
+(use-package org-pomodoro
   :ensure t
   :after org
-  :hook (org-mode . org-superstar-mode)
   :config
-  (setq org-hide-leading-stars t
-        org-superstar-leading-bullet ?\s
-        org-indent-mode-turns-on-hiding-stars nil
-        org-superstar-remove-leading-stars t
-        org-superstar-cycle-headline-bullets nil ; changes cycling behavior
-        org-superstar-headline-bullets-list '("⁙" "⁘" "⁖" "⁚" "‧")))
+  (setq org-pomodoro-manual-break t
+        org-pomodoro-keep-killed-time t
+        org-pomodoro-start-sound "~/.emacs.d/sounds/focus_bell.wav"
+        org-pomodoro-short-break-sound "~/.emacs.d/sounds/three_beeps.wav"
+        org-pomodoro-long-break-sound "~/.emacs.d/sounds/three_beeps.wav"
+        org-pomodoro-finished-sound "~/.emacs.d/sounds/meditation_bell.wav"))
 
-(defun cr/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :ensure t
-  :hook (org-mode . cr/org-mode-visual-fill))
-
-(use-package toc-org
-  :ensure t
-  :hook ((org-mode . toc-org-mode)
-         (markdown-mode . toc-org-mode))
-  :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
-
-(use-package markdown-mode
-  :ensure t
-  :mode "\\.md\\'"
-  :config
-  (setq markdown-command "marked")
-
-  (defun cr/set-markdown-header-font-sizes ()
-    (dolist (face '((markdown-header-face-1 . 1.5)
-		    (markdown-header-face-2 . 1.2)
-		    (markdown-header-face-3 . 1.1)
-		    (markdown-header-face-4 . 1.0)
-		    (markdown-header-face-5 . 1.0)))
-(set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
-
-  (defun cr/markdown-mode-hook ()
-    (cr/set-markdown-header-font-sizes))
-
-  (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
+(cr/leader-key
+ "op" '(org-pomodoro :which-key "pomodoro"))
 
 (use-package treemacs
   :ensure t
@@ -375,10 +467,9 @@
     :hook (company-mode . company-box-mode))
 
 (defun cr/switch-project-action ()
-  "Switch to a perspective named after the project, start `magit-status' and `treemacs'."
+  "Switch to a perspective named after the project, start `magit-status'."
   (persp-switch (projectile-project-name))
-  (magit-status)
-  (treemacs))
+  (magit-status))
 
 (use-package projectile
   :ensure t
@@ -390,6 +481,12 @@
   (when (file-directory-p "~/projects/code")
     (setq projectile-project-search-path '("~/projects/code")))
   (setq projectile-switch-project-action #'cr/switch-project-action))
+
+(cr/leader-key
+  "p" '(:ignore t :which-key "projectile")
+  "pa" '(projectile-add-known-project :which-key "make project known to projectile")
+  "pp" '(projectile-switch-project :which-key "switch to project")
+  "pf" '(projectile-find-file :which-key "find file in current project"))
 
 (use-package counsel-projectile
   ;; Extremely slow for some reason, disabling for now
