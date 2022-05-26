@@ -20,13 +20,13 @@
   ## TODO: Make bluetooth support into an optional module
   hardware.enableAllFirmware = true;
 
-  hardware.pulseaudio = {
-    enable = true;
-    package = pkgs.pulseaudioFull;
-    extraConfig = ''
-      load-module module-switch-on-connect
-    '';
-  };
+  # hardware.pulseaudio = {
+  #   enable = true;
+  #   package = pkgs.pulseaudioFull.override { jackaudioSupport = true; };
+  #   extraConfig = ''
+  #     load-module module-switch-on-connect
+  #   '';
+  # };
 
   hardware.bluetooth = {
     enable = true;
@@ -41,6 +41,10 @@
 
   services.blueman.enable = true;
 
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTR{idVendor}=="0d28", ATTR{idProduct}=="0204", MODE:="666"
+  '';
+  
   environment = { systemPackages = with pkgs; [ firefox syncplay ]; };
 
   # make whatis, apropos, and man -k work again
@@ -80,6 +84,12 @@
     avahi = {
       enable = true;
       nssmdns = true;
+    };
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      pulse.enable = true;
+      # wireplumber.enable = true;
     };
   };
 
