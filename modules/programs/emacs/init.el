@@ -245,7 +245,7 @@
   :ensure t
   :mode "\\.md\\'"
   :config
-  (setq markdown-command "marked")
+  (setq markdown-command "markdown")
 
   (defun cr/set-markdown-header-font-sizes ()
     (dolist (face '((markdown-header-face-1 . 1.5)
@@ -278,7 +278,8 @@
 (with-eval-after-load 'org
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((emacs-lisp . t)))
+   '((emacs-lisp . t)
+     (shell . t)))
   (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
 (with-eval-after-load 'org
@@ -445,6 +446,10 @@
   :mode "\\.hs\\'"
   :init (setq haskell-program-name "ghci"))
 
+(use-package python-mode
+  :ensure t
+  :mode  "\\.py\\'")
+
 (use-package magit
   :ensure t
   :commands magit-status)
@@ -520,3 +525,6 @@
          emacs-lisp-mode
          web-mode
          js2-mode))
+
+(use-package vterm
+  :ensure t)

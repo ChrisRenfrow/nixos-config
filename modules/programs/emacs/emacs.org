@@ -47,6 +47,7 @@ it will be under Nix.
   - [[#commenting][Commenting]]
   - [[#rainbows][Rainbows]]
 - [[#terminals][Terminals]]
+  - [[#vterm][vterm]]
 - [[#file-management][File Management]]
 
 * Early-initialization
@@ -553,7 +554,7 @@ prefers.
     :ensure t
     :mode "\\.md\\'"
     :config
-    (setq markdown-command "marked")
+    (setq markdown-command "markdown")
 
     (defun cr/set-markdown-header-font-sizes ()
       (dolist (face '((markdown-header-face-1 . 1.5)
@@ -605,7 +606,8 @@ larger org files like this one.
   (with-eval-after-load 'org
     (org-babel-do-load-languages
      'org-babel-load-languages
-     '((emacs-lisp . t)))
+     '((emacs-lisp . t)
+       (shell . t)))
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
 #+end_src
 
@@ -858,6 +860,14 @@ hierarchy, and other things one might see in a modern IDE.
     :init (setq haskell-program-name "ghci"))
 #+end_src
 
+*** Python
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package python-mode
+    :ensure t
+    :mode  "\\.py\\'")
+#+end_src
+
 ** Magit
 
 #+begin_src emacs-lisp :tangle init.el
@@ -980,5 +990,11 @@ color they describe. Enable in a few select modes.
 #+end_src
 
 * Terminals
+** vterm
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package vterm
+    :ensure t)
+#+end_src
 
 * File Management
