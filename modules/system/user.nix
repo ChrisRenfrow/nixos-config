@@ -45,36 +45,36 @@ in {
   config = rec {
     users.users."${cfg.name}" =
       mkAliasDefinitions options.system.user.extraConfig;
-    home-manager.users."${cfg.name}" =
-      mkAliasDefinitions options.system.user.hm;
+      home-manager.users."${cfg.name}" =
+        mkAliasDefinitions options.system.user.hm;
 
-    system.user = {
-      uid = 1000;
-      home = "/home/${cfg.name}";
+        system.user = {
+          uid = 1000;
+          home = "/home/${cfg.name}";
 
-      extraConfig = {
-        home = mkAliasDefinitions options.system.user.home;
-        uid = mkAliasDefinitions options.system.user.uid;
-        extraGroups = [ "wheel" "video" ];
-        isNormalUser = true;
-      };
+          extraConfig = {
+            home = mkAliasDefinitions options.system.user.home;
+            uid = mkAliasDefinitions options.system.user.uid;
+            extraGroups = [ "wheel" "video" "jackaudio" ];
+            isNormalUser = true;
+          };
 
-      hm = {
-        xdg = {
-          enable = true;
-          userDirs = {
-            enable = true;
-            desktop = "/dev/null";
-            publicShare = "/dev/null";
-            templates = "/dev/null";
-            documents = "${cfg.home}/documents";
-            download = "${cfg.home}/downloads";
-            music = "${cfg.home}/music";
-            pictures = "${cfg.home}/pictures";
-            videos = "${cfg.home}/videos";
+          hm = {
+            xdg = {
+              enable = true;
+              userDirs = {
+                enable = true;
+                desktop = "/dev/null";
+                publicShare = "/dev/null";
+                templates = "/dev/null";
+                documents = "${cfg.home}/documents";
+                download = "${cfg.home}/downloads";
+                music = "${cfg.home}/music";
+                pictures = "${cfg.home}/pictures";
+                videos = "${cfg.home}/videos";
+              };
+            };
           };
         };
-      };
-    };
   };
 }
