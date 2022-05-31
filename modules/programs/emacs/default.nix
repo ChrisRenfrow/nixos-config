@@ -54,6 +54,7 @@ in {
         ## rust-mode
         cargo
         rustfmt
+        rust-analyzer
         ## haskell-mode
         ghc
         ghcid

@@ -7,8 +7,8 @@
 
 (add-hook 'emacs-startup-hook #'cr/display-startup-time)
 
-;; Set default to 20mb (in bytes)
-(setq gc-cons-threshold (* 20 1000 1000))
+;; Set default to 200mb (in bytes)
+(setq gc-cons-threshold (* 200 1000 1000))
 
 (setq comp-deferred-compilation nil)
 
