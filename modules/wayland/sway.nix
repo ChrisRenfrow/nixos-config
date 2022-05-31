@@ -42,7 +42,9 @@ in {
       XDG_CURRENT_DESKTOP = "sway";
     };
 
-    system.user.hm.xsession.pointerCursor = {
+    system.user.hm.home.pointerCursor = {
+      x11.enable = true;
+      gtk.enable = true;
       name = "Adwaita";
       package = pkgs.gnome.adwaita-icon-theme;
       size = 24;
@@ -71,14 +73,14 @@ in {
         enable = true;
         settings.default_session = {
           command = "${
-            makeBinPath [ pkgs.greetd.tuigreet ]
-          }/tuigreet --asterisks --time --cmd sway";
+              makeBinPath [ pkgs.greetd.tuigreet ]
+            }/tuigreet --asterisks --time --cmd sway";
           user = "${config.system.user.name}";
         };
       };
 
       dbus.enable = true;
-      
+
     };
   };
 }

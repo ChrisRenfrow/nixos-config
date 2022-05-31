@@ -44,7 +44,7 @@
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="0d28", ATTR{idProduct}=="0204", MODE:="666"
   '';
-  
+
   environment = { systemPackages = with pkgs; [ firefox syncplay ]; };
 
   # make whatis, apropos, and man -k work again
@@ -73,6 +73,8 @@
   system = {
     user.name = "crenfrow";
     locale.locationName = "San Francisco";
+    stateVersion =
+      "22.05"; # https://nixos.org/manual/nixos/stable/options.html#opt-system.stateVersion
   };
 
   nix.settings.trusted-users = [ "crenfrow" ];
