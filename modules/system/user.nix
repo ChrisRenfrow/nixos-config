@@ -55,7 +55,7 @@ in {
           extraConfig = {
             home = mkAliasDefinitions options.system.user.home;
             uid = mkAliasDefinitions options.system.user.uid;
-            extraGroups = [ "wheel" "video" "jackaudio" ];
+            extraGroups = [ "wheel" "video" "jackaudio" "dialout" ];
             isNormalUser = true;
           };
 
