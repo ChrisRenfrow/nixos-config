@@ -56,7 +56,7 @@ in {
           enable = true;
           settings = {
             screencast = {
-              max_fps = 30;
+              max_fps = 10;
               chooser_type = "simple";
               chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
             };
