@@ -28,26 +28,33 @@ it will be under Nix.
 - [[#org-mode][Org Mode]]
   - [[#font][Font]]
   - [[#setup][Setup]]
+  - [[#org-mode-1][org-mode]]
   - [[#org-superstar][org-superstar]]
   - [[#markdown-mode][markdown-mode]]
-  - [[#visual-fill][Visual fill]]
+  - [[#pandoc-mode][pandoc-mode]]
+  - [[#visual-fill-column][visual-fill-column]]
   - [[#toc-org][toc-org]]
   - [[#babel][Babel]]
   - [[#evil-org][evil-org]]
   - [[#org-roam][org-roam]]
   - [[#org-drill][org-drill]]
   - [[#org-pomodoro][org-pomodoro]]
+  - [[#org-present][org-present]]
 - [[#code][Code]]
-  - [[#treemacs][Treemacs]]
-  - [[#languages][Languages]]
-  - [[#magit][Magit]]
-  - [[#company-mode][Company Mode]]
-  - [[#projectile][Projectile]]
-  - [[#perspective][Perspective]]
-  - [[#commenting][Commenting]]
-  - [[#rainbows][Rainbows]]
+  - [[#language-support][Language Support]]
+  - [[#treemacs][treemacs]]
+  - [[#magit][magit]]
+  - [[#git-gutter][git-gutter]]
+  - [[#git-gutter-fringe][git-gutter-fringe]]
+  - [[#company][company]]
+  - [[#projectile][projectile]]
+  - [[#perspective][perspective]]
+  - [[#evil-nerd-commenter][evil-nerd-commenter]]
+  - [[#rainbow-delimiters][rainbow-delimiters]]
+  - [[#rainbow-mode][rainbow-mode]]
 - [[#terminals][Terminals]]
   - [[#vterm][vterm]]
+  - [[#vterm-toggle][vterm-toggle]]
 - [[#file-management][File Management]]
 
 * Early-initialization
@@ -69,12 +76,15 @@ collections.
 
 Ideally I would fine-tune this but after faffing about with it too
 much one evening and not getting the results I want I've decided to
-leave it at 20mb for now.
+leave it at 100mb for now.
 
 #+begin_src emacs-lisp :tangle early-init.el
 
-  ;; Set default to 200mb (in bytes)
-  (setq gc-cons-threshold (* 200 1000 1000))
+  ;; Set default to 100mb (in bytes)
+  (setq gc-cons-threshold 100000000)
+
+  ;; Increase the amount of data which Emacs reads from the process
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
 #+end_src
 
@@ -152,6 +162,7 @@ default font sizes. May expand later.
 Make =tab-width= narrower globally.
 
 #+begin_src emacs-lisp :tangle init.el
+  (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)
 #+end_src
 
@@ -290,7 +301,7 @@ default to =doom-solarized-light=.
 
   (use-package doom-themes
     :ensure t
-    :init (load-theme 'doom-solarized-light t))
+    :init (load-theme 'doom-solarized-dark t))
 
 #+end_src
 
@@ -499,7 +510,11 @@ behavior.
     (auto-fill-mode 0)
     (visual-line-mode 1)
     (setq evil-auto-indent nil))
+#+end_src
 
+** org-mode
+
+#+begin_src emacs-lisp :tangle init.el
   (use-package org
     :ensure t
     :commands (org-capture org-agenda)
@@ -513,7 +528,6 @@ behavior.
           org-edit-src-content-indentation 2
           org-hide-block-startup nil
           org-src-preserve-indentation nil
-          org-hide-emphasis-markers t
           org-cycle-separator-lines 2
           org-startup-folded 'content)
     (cr/org-font-setup))
@@ -569,7 +583,14 @@ prefers.
     (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
 #+end_src
 
-** Visual fill
+** pandoc-mode
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package pandoc-mode
+    :ensure t)
+#+end_src
+
+** visual-fill-column
 
 Make it so org-mode and markdown-mode buffers are centered using
 =visual-fill-column=.
@@ -748,55 +769,24 @@ Org roam, a.k.a. my second-brain.
    "op" '(org-pomodoro :which-key "pomodoro"))
 #+end_src
 
-* Code
-** Treemacs
+** org-present
 
-Enable and customize treemacs, a file browser buffer. Also add several
-treemacs extensions that compliment other packages in use.
+Minimalist presentation minor-mode within org-mode.
 
 #+begin_src emacs-lisp :tangle init.el
-  (use-package treemacs
-    :ensure t
-    :config
-    (treemacs-filewatch-mode 1)
-    (treemacs-follow-mode 1)
-    (treemacs-project-follow-mode 1)
-    (treemacs-git-mode 'deferred)
-    (treemacs-indent-guide-mode 1))
-
-  (use-package treemacs-icons-dired
-    :ensure t
-    :hook (dired-mode . treemacs-icons-dired-enable-once))
-
-  (use-package treemacs-all-the-icons
-    :ensure t
-    :after (treemacs all-the-icons)
-    :config (treemacs-load-theme "all-the-icons"))
-
-  (use-package treemacs-evil
-    :ensure t
-    :after (treemacs evil))
-
-  (use-package treemacs-projectile
-    :ensure t
-    :after (treemacs projectile))
-
-  (use-package treemacs-magit
-    :ensure t
-    :after (treemacs magit))
-
-  (use-package treemacs-perspective
-    :ensure t
-    :after (treemacs persp-mode)
-    :config (treemacs-set-scope-type 'Perspectives))
+  (use-package org-present
+    :ensure t)
 #+end_src
+ 
 
-** Languages
-*** Language Server Protocol (LSP)
+* Code
+** Language Support
+*** lsp-mode
 
-Also known as "the one cool thing Microsoft ever did".
+Language Server Protocol (LSP), also known as /"that one cool thing\
+Microsoft did"/.
 
-There's a lot going on with lsp-mode, so we've set a keymap prefix
+There's a lot going on with =lsp-mode=, so we've set a keymap prefix
 paired with which-key integration to make it easy to explore.
 
 #+begin_src emacs-lisp :tangle init.el
@@ -805,7 +795,8 @@ paired with which-key integration to make it easy to explore.
     :hook (prog-mode . lsp)
     :commands (lsp lsp-deferred)
     :init
-    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-keymap-prefix "C-c l"
+          lsp-use-plists nil)
     :custom
     (lsp-eldoc-render-all t)
     (lsp-idle-delay 0.6)
@@ -871,7 +862,6 @@ Pulling some inspiration from https://robert.kra.hn/posts/rust-emacs-setup/#rust
 #+begin_src emacs-lisp :tangle init.el
   (use-package rustic
     :ensure t
-    :mode "\\.rs\\'"
     :after lsp-mode
     :bind (:map rustic-mode-map
                 ("M-j" . lsp-ui-imenu)
@@ -911,7 +901,49 @@ Pulling some inspiration from https://robert.kra.hn/posts/rust-emacs-setup/#rust
     :mode  "\\.py\\'")
 #+end_src
 
-** Magit
+** treemacs
+
+Enable and customize treemacs, a file browser buffer. Also add several
+treemacs extensions that compliment other packages in use.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package treemacs
+    :ensure t
+    :config
+    (treemacs-filewatch-mode 1)
+    (treemacs-follow-mode 1)
+    (treemacs-project-follow-mode 1)
+    (treemacs-git-mode 'deferred)
+    (treemacs-indent-guide-mode 1))
+
+  (use-package treemacs-icons-dired
+    :ensure t
+    :hook (dired-mode . treemacs-icons-dired-enable-once))
+
+  (use-package treemacs-all-the-icons
+    :ensure t
+    :after (treemacs all-the-icons)
+    :config (treemacs-load-theme "all-the-icons"))
+
+  (use-package treemacs-evil
+    :ensure t
+    :after (treemacs evil))
+
+  (use-package treemacs-projectile
+    :ensure t
+    :after (treemacs projectile))
+
+  (use-package treemacs-magit
+    :ensure t
+    :after (treemacs magit))
+
+  (use-package treemacs-perspective
+    :ensure t
+    :after (treemacs persp-mode)
+    :config (treemacs-set-scope-type 'Perspectives))
+#+end_src
+
+** magit
 
 #+begin_src emacs-lisp :tangle init.el
   (use-package magit
@@ -919,7 +951,33 @@ Pulling some inspiration from https://robert.kra.hn/posts/rust-emacs-setup/#rust
     :commands magit-status)
 #+end_src
 
-** Company Mode
+** git-gutter
+
+Display git-status indicators in the gutter like a /certain/ modern IDE.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package git-gutter
+    :ensure t
+    :hook (prog-mode . git-gutter-mode)
+    :config
+    (setq git-gutter:update-interval 0.2))
+#+end_src
+
+** git-gutter-fringe
+
+Yoink the fringe settings from doomemacs because it looks great.
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package git-gutter-fringe
+    :ensure t
+    :config
+    ;; https://github.com/doomemacs/doomemacs/issues/2246
+    (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+#+end_src
+
+** company
 
 #+begin_src emacs-lisp :tangle init.el
   (use-package company
@@ -940,7 +998,7 @@ Pulling some inspiration from https://robert.kra.hn/posts/rust-emacs-setup/#rust
       :hook (company-mode . company-box-mode))
 #+end_src
 
-** Projectile
+** projectile
 
 Projectile is a project management library.
 
@@ -975,7 +1033,7 @@ Projectile is a project management library.
     :config (counsel-projectile-mode))
 #+end_src
 
-** Perspective
+** perspective
 
 Perspective gives us "lenses" to view our buffers through. Everything
 is kept in it's assigned perspective, making it easy to switch between
@@ -994,7 +1052,7 @@ several projects during one session.
     (persp-mode))
 #+end_src
 
-** Commenting
+** evil-nerd-commenter
 
 Adds predictable comment region functionality for evil mode users.
 
@@ -1004,11 +1062,7 @@ Adds predictable comment region functionality for evil mode users.
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 #+end_src
 
-** Rainbows
-
-Who doesn't like rainbows?
-
-*** rainbow-delimiters
+** rainbow-delimiters
 
 Add rainbow delimiters to make it easier to keep track of nesting.
 
@@ -1018,7 +1072,7 @@ Add rainbow delimiters to make it easier to keep track of nesting.
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
-*** rainbow-mode
+** rainbow-mode
 
 Make the background of color definitions (hex, rbg, etc.) reflect the
 color they describe. Enable in a few select modes.
@@ -1038,6 +1092,33 @@ color they describe. Enable in a few select modes.
 #+begin_src emacs-lisp :tangle init.el
   (use-package vterm
     :ensure t)
+
+  (cr/leader-key
+    "s" '(:ignore t :which-key "shells")
+    "sv" '(:ignore t :which-key "vterm")
+    "svv" '(vterm :which-key "open vterm in the current buffer"))
+#+end_src
+
+** vterm-toggle
+
+Toggles to and from the vterm buffer. Here I've set it up to
+automatically cd to the same directory as the file buffer I enter the
+key-presses in.
+
+#+begin_src emacs-lisp :tangle init.el
+    (use-package vterm-toggle
+      :ensure t
+      :after vterm
+      :config
+      :bind (:map vterm-mode-map
+                  ("C-<return>" . vterm-toggle-insert-cd)))
+
+    (cr/leader-key
+      "svc" '(vterm-toggle-cd :which-key
+                              "toggle and cd vterm to the current file buffer's directory")
+      "svt" '(vterm-toggle :which-key
+                           "toggle between the current buffer and the vterm buffer"))
 #+end_src
 
 * File Management
+ 

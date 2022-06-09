@@ -19,6 +19,7 @@
 (defvar cr/projects-base-directory "~/projects/code"
   "The location I keep my code projects, mostly used by =projectile=")
 
+(setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
 
 (use-package no-littering
@@ -98,7 +99,7 @@
 
 (use-package doom-themes
   :ensure t
-  :init (load-theme 'doom-solarized-light t))
+  :init (load-theme 'doom-solarized-dark t))
 
 (use-package all-the-icons
   :ensure t)
@@ -215,7 +216,6 @@
         org-edit-src-content-indentation 2
         org-hide-block-startup nil
         org-src-preserve-indentation nil
-        org-hide-emphasis-markers t
         org-cycle-separator-lines 2
         org-startup-folded 'content)
   (cr/org-font-setup))
@@ -258,6 +258,9 @@
   (defun cr/markdown-mode-hook ()
     (cr/set-markdown-header-font-sizes))
   (add-hook 'markdown-mode-hook 'cr/markdown-mode-hook))
+
+(use-package pandoc-mode
+  :ensure t)
 
 (defun cr/doc-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -379,6 +382,73 @@
 (cr/leader-key
  "op" '(org-pomodoro :which-key "pomodoro"))
 
+(use-package org-present
+  :ensure t)
+
+(use-package lsp-mode
+  :ensure t
+  :hook (prog-mode . lsp)
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l"
+        lsp-use-plists nil)
+  :custom
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  :config
+  (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-treemacs
+  :ensure t
+  :after lsp)
+
+(use-package lsp-ivy
+  :ensure t
+  :after lsp)
+
+(use-package flycheck
+  :ensure t)
+
+(use-package rustic
+  :ensure t
+  :after lsp-mode
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
+  :custom
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-closure-return-type-hints t)
+  (lsp-rust-analyzer-display-parameter-hints t)
+  (lsp-rust-analyzer-display-reborrow-hints t)
+  :config
+  (setq rustic-format-on-save t))
+
+(use-package haskell-mode
+  :ensure t
+  :mode "\\.hs\\'"
+  :init (setq haskell-program-name "ghci"))
+
+(use-package python-mode
+  :ensure t
+  :mode  "\\.py\\'")
+
 (use-package treemacs
   :ensure t
   :config
@@ -414,73 +484,23 @@
   :after (treemacs persp-mode)
   :config (treemacs-set-scope-type 'Perspectives))
 
-(use-package lsp-mode
-  :ensure t
-  :hook (prog-mode . lsp)
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :custom
-  (lsp-eldoc-render-all t)
-  (lsp-idle-delay 0.6)
-  :config
-  (lsp-enable-which-key-integration t))
-
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode
-  :custom
-  (lsp-ui-peek-always-show t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-doc-position 'bottom))
-
-(use-package lsp-treemacs
-  :ensure t
-  :after lsp)
-
-(use-package lsp-ivy
-  :ensure t
-  :after lsp)
-
-(use-package flycheck
-  :ensure t)
-
-(use-package rustic
-  :ensure t
-  :mode "\\.rs\\'"
-  :after lsp-mode
-  :bind (:map rustic-mode-map
-              ("M-j" . lsp-ui-imenu)
-              ("M-?" . lsp-find-references)
-              ("C-c C-c l" . flycheck-list-errors)
-              ("C-c C-c a" . lsp-execute-code-action)
-              ("C-c C-c r" . lsp-rename)
-              ("C-c C-c q" . lsp-workspace-restart)
-              ("C-c C-c Q" . lsp-workspace-shutdown)
-              ("C-c C-c s" . lsp-rust-analyzer-status))
-  :custom
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-  (lsp-rust-analyzer-display-chaining-hints t)
-  (lsp-rust-analyzer-display-closure-return-type-hints t)
-  (lsp-rust-analyzer-display-parameter-hints t)
-  (lsp-rust-analyzer-display-reborrow-hints t)
-  :config
-  (setq rustic-format-on-save t))
-
-(use-package haskell-mode
-  :ensure t
-  :mode "\\.hs\\'"
-  :init (setq haskell-program-name "ghci"))
-
-(use-package python-mode
-  :ensure t
-  :mode  "\\.py\\'")
-
 (use-package magit
   :ensure t
   :commands magit-status)
+
+(use-package git-gutter
+  :ensure t
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  (setq git-gutter:update-interval 0.2))
+
+(use-package git-gutter-fringe
+  :ensure t
+  :config
+  ;; https://github.com/doomemacs/doomemacs/issues/2246
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
 (use-package company
     :ensure t
@@ -556,3 +576,21 @@
 
 (use-package vterm
   :ensure t)
+
+(cr/leader-key
+  "s" '(:ignore t :which-key "shells")
+  "sv" '(:ignore t :which-key "vterm")
+  "svv" '(vterm :which-key "open vterm in the current buffer"))
+
+(use-package vterm-toggle
+  :ensure t
+  :after vterm
+  :config
+  :bind (:map vterm-mode-map
+              ("C-<return>" . vterm-toggle-insert-cd)))
+
+(cr/leader-key
+  "svc" '(vterm-toggle-cd :which-key
+                          "toggle and cd vterm to the current file buffer's directory")
+  "svt" '(vterm-toggle :which-key
+                       "toggle between the current buffer and the vterm buffer"))

@@ -7,8 +7,11 @@
 
 (add-hook 'emacs-startup-hook #'cr/display-startup-time)
 
-;; Set default to 200mb (in bytes)
-(setq gc-cons-threshold (* 200 1000 1000))
+;; Set default to 100mb (in bytes)
+(setq gc-cons-threshold 100000000)
+
+;; Increase the amount of data which Emacs reads from the process
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
 
 (setq comp-deferred-compilation nil)
 
