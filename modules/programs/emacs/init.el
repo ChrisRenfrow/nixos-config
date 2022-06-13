@@ -549,10 +549,10 @@
   :config (counsel-projectile-mode))
 
 (use-package perspective
-  :ensure t
+  :ensure t 
   :bind (("C-M-k" . persp-switch)
          ("C-M-n" . persp-next)
-         ("C-x b" . persp-counsel-switch-buffer*)
+         ("C-x b" . persp-ivy-switch-buffer)
          ("C-x k" . persp-kill-buffer*))
   :custom
   (persp-mode-prefix-key (kbd "C-c M-p"))
@@ -573,6 +573,27 @@
          emacs-lisp-mode
          web-mode
          js2-mode))
+
+(use-package auctex
+  :defer t
+  :ensure auctex
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq TeX-command-default "LatexMk")
+  (setq-default TeX-master nil)
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (TeX-global-PDF-mode t)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t))
+
+(use-package auctex-latexmk
+  :after auctex
+  :ensure t
+  :config
+  (auctex-latexmk-setup))
 
 (use-package vterm
   :ensure t)

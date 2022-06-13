@@ -68,6 +68,7 @@ in {
         ## auctex
         texinfo
         texlive.combined.scheme-full
+        evince # PDF-viewer
         ## Misc
         python39
         pandoc
