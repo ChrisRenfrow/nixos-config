@@ -449,6 +449,11 @@
   :ensure t
   :mode  "\\.py\\'")
 
+(use-package nix-mode
+  :ensure t
+  :mode "\\.nix\\'"
+  :init (add-hook 'before-save-hook 'nix-format-before-save))
+
 (use-package treemacs
   :ensure t
   :config
