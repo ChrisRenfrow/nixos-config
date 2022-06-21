@@ -28,6 +28,15 @@
   #   '';
   # };
 
+  hardware = {
+    opengl = {
+      enable = true;
+      setLdLibraryPath = true;
+      driSupport = true;
+      driSupport32Bit = true;
+    };
+  };
+
   hardware.bluetooth = {
     enable = true;
     settings = {
