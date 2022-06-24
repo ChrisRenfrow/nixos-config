@@ -1,12 +1,16 @@
 (defvar package-quickstart t)
 
+(require 'package)
+
 (eval-when-compile
   (require 'use-package))
 
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/"))
+
 (eval-and-compile
-  (setq package-enable-at-startup nil)
-  (setq use-package-ensure-function 'ignore)
-  (setq package-archives nil))
+  (setq package-enable-at-startup nil
+        use-package-expand-minimally t))
 
 (setq name "Chris Renfrow"
       email "dev@chrisrenfrow.me")
@@ -90,10 +94,14 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-;; Disable line numbers for some modes
+;; Disable line numbers for certain modes
 (dolist (mode '(org-mode-hook
+                dired-mode-hook
+                magit-mode-hook
+                vterm-mode-hook
                 term-mode-hook
                 shell-mode-hook
+                lsp-ui-imenu-mode-hook
                 treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
@@ -117,6 +125,11 @@
 (use-package minions
   :ensure t
   :config (minions-mode 1))
+
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode 1))
 
 (use-package which-key
   :ensure t
@@ -274,6 +287,7 @@
 
 (use-package toc-org
   :ensure t
+  :after org
   :hook ((org-mode . toc-org-mode)
          (markdown-mode . toc-org-mode))
   :bind ("C-c C-o" . toc-org-markdown-follow-thing-at-point))
@@ -391,7 +405,7 @@
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l"
-        lsp-use-plists nil)
+        lsp-use-plists t)
   :custom
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
@@ -429,14 +443,14 @@
               ("C-c C-c q" . lsp-workspace-restart)
               ("C-c C-c Q" . lsp-workspace-shutdown)
               ("C-c C-c s" . lsp-rust-analyzer-status))
-  :custom
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-  (lsp-rust-analyzer-display-chaining-hints t)
-  (lsp-rust-analyzer-display-closure-return-type-hints t)
-  (lsp-rust-analyzer-display-parameter-hints t)
-  (lsp-rust-analyzer-display-reborrow-hints t)
+  ;; :custom
+  ;; (lsp-rust-analyzer-cargo-watch-command "clippy")
+  ;; (lsp-rust-analyzer-server-display-inlay-hints t)
+  ;; (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  ;; (lsp-rust-analyzer-display-chaining-hints t)
+  ;; (lsp-rust-analyzer-display-closure-return-type-hints t)
+  ;; (lsp-rust-analyzer-display-parameter-hints t)
+  ;; (lsp-rust-analyzer-display-reborrow-hints t)
   :config
   (setq rustic-format-on-save t))
 
@@ -600,8 +614,7 @@
   :config
   (auctex-latexmk-setup))
 
-(use-package vterm
-  :ensure t)
+(use-package vterm)
 
 (cr/leader-key
   "s" '(:ignore t :which-key "shells")
