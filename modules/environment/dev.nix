@@ -29,8 +29,7 @@ in {
 
     environment.systemPackages = with pkgs;
       [ alacritty direnv cmake gnumake clang clang-tools git ]
-      ++ optionals cfg.enableRust [ rustc cargo rustup rls rustfmt ]
-      ++ optionals cfg.enableHaskell [
+      ++ optionals cfg.enableRust [ rustup ] ++ optionals cfg.enableHaskell [
         ghc
         haskell-language-server
         cabal-install
@@ -43,7 +42,7 @@ in {
           enable = true;
           nix-direnv.enable = true;
         };
-        
+
         git = {
           enable = true;
           userName = "ChrisRenfrow";
