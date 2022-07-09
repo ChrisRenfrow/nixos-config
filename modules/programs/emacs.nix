@@ -18,7 +18,8 @@ in {
     system.user.hm = {
       programs.emacs = {
         enable = true;
-        package = (emacsWithPackages (epkgs: with epkgs; [ nix-mode vterm ]));
+        package =
+          (emacsWithPackages (epkgs: with epkgs; [ nix-mode vterm direnv ]));
       };
     };
 
@@ -46,14 +47,17 @@ in {
         ## js2-mode & typescript-mode
         nodejs
         yarn
+        ## python 
+        python3
+        python3Packages.python-lsp-server
         ## auctex
         texinfo
         texlive.combined.scheme-full
         evince # PDF-viewer
         ## Misc
-        python39
         pandoc
         imagemagick
+        direnv
       ];
     };
   };
